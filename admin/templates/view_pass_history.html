@@ -1,0 +1,52 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-4xl font-extrabold text-gray-800 mb-2">Pass History</h1>
+    <h2 class="text-2xl font-semibold text-gray-600 mb-6">{{ user.name }}</h2>
+
+    <div class="bg-white rounded-2xl shadow-2xl p-8">
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm align-middle whitespace-nowrap">
+                <thead>
+                    <tr class="border-b border-gray-200">
+                        <th class="p-4 text-left font-semibold text-gray-600">Date</th>
+                        <th class="p-4 text-left font-semibold text-gray-600">Reason</th>
+                        <th class="p-4 text-left font-semibold text-gray-600">Status</th>
+                        <th class="p-4 text-left font-semibold text-gray-600">Approved By</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pass in pass_history %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-50">
+                        <td class="p-4 text-gray-700">{{ pass.request_time | format_datetime }}</td>
+                        <td class="p-4 text-gray-700">{{ pass.reason }}</td>
+                        <td class="p-4">
+                            <span class="px-2.5 py-1 text-xs font-semibold rounded-full
+                                {% if pass.status == 'approved' %} bg-green-100 text-green-800
+                                {% elif pass.status == 'rejected' %} bg-red-100 text-red-800
+                                {% elif pass.status == 'pending' %} bg-yellow-100 text-yellow-800
+                                {% else %} bg-gray-100 text-gray-800
+                                {% endif %}">
+                                {{ pass.status | capitalize }}
+                            </span>
+                        </td>
+                        <td class="p-4 text-gray-700">{{ pass.approved_by or 'N/A' }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="p-4 text-center text-gray-500">No pass history found for this user.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // JavaScript for this page, if any
+</script>
+{% endblock %}

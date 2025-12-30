@@ -1,0 +1,59 @@
+
+{% extends "admin_base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+  <h2 class="text-3xl font-bold text-gray-800 mb-8">Pass Management</h2>
+
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="p-6">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Student Name</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll Number</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pass Type</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for p in passes %}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">{{ p.student_name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ p.student_roll }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ p.pass_type }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ p.reason }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                  {% if p.status == 'approved' %} bg-green-100 text-green-800 
+                  {% elif p.status == 'rejected' %} bg-red-100 text-red-800 
+                  {% else %} bg-yellow-100 text-yellow-800 {% endif %}">
+                  {{ p.status }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                {% if p.status == 'pending' %}
+                  <form action="{{ url_for('admin.approve_pass', pass_id=p.id) }}" method="POST" class="inline">
+                    <button type="submit" class="text-green-600 hover:text-green-900">Approve</button>
+                  </form>
+                  <form action="{{ url_for('admin.reject_pass', pass_id=p.id) }}" method="POST" class="inline ml-4">
+                    <button type="submit" class="text-red-600 hover:text-red-900">Reject</button>
+                  </form>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="6" class="text-center py-4">No passes found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+
+{% extends "admin_base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+  <h1 class="text-3xl font-bold text-gray-800 mb-6 animate-fade-in-down">System Settings</h1>
+
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden animate-fade-in-up">
+    <form action="{{ url_for('admin.settings') }}" method="POST">
+      <div class="px-4 py-5 sm:p-6">
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Pass Time Windows</h3>
+        <p class="mt-1 text-sm text-gray-500">Define the hours during which students and faculty can request passes.</p>
+
+        <!-- Student Settings -->
+        <div class="mt-6">
+          <h4 class="text-md font-medium text-gray-800">Student Pass Settings</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+            <div>
+              <label for="student_start_time" class="block text-sm font-medium text-gray-700">Start Time</label>
+              <input type="time" name="student_start_time" id="student_start_time" value="{{ settings.student.start_time | default('09:00') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            </div>
+            <div>
+              <label for="student_end_time" class="block text-sm font-medium text-gray-700">End Time</label>
+              <input type="time" name="student_end_time" id="student_end_time" value="{{ settings.student.end_time | default('17:00') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Faculty Settings -->
+        <div class="mt-8 border-t pt-6">
+          <h4 class="text-md font-medium text-gray-800">Faculty Pass Settings</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+              <div>
+              <label for="faculty_start_time" class="block text-sm font-medium text-gray-700">Start Time</label>
+              <input type="time" name="faculty_start_time" id="faculty_start_time" value="{{ settings.faculty.start_time | default('08:00') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            </div>
+            <div>
+              <label for="faculty_end_time" class="block text-sm font-medium text-gray-700">End Time</label>
+              <input type="time" name="faculty_end_time" id="faculty_end_time" value="{{ settings.faculty.end_time | default('18:00') }}" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Jumma Pass -->
+        <div class="mt-8 border-t pt-6">
+            <h4 class="text-md font-medium text-gray-800">Special Passes</h4>
+            <div class="flex items-start mt-4">
+                <div class="flex items-center h-5">
+                    <input id="jumma_pass_enabled" name="jumma_pass_enabled" type="checkbox" class="focus:ring-green-500 h-4 w-4 text-green-600 border-gray-300 rounded" {% if settings.jumma_pass_enabled %}checked{% endif %}>
+                </div>
+                <div class="ml-3 text-sm">
+                    <label for="jumma_pass_enabled" class="font-medium text-gray-700">Enable Jumma Prayer Pass</label>
+                    <p class="text-gray-500">Allow students to request a special pass for Friday prayers.</p>
+                </div>
+            </div>
+        </div>
+
+      </div>
+      <div class="px-4 py-3 bg-gray-50 text-right sm:px-6">
+        <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">Save All Settings</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

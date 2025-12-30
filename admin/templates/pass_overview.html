@@ -1,0 +1,77 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-8 py-8">
+    <h1 class="text-4xl font-extrabold text-green-900 mb-8">Pass Overview</h1>
+
+    <!-- Filters -->
+    <form method="GET" class="bg-green-100 shadow-lg rounded-2xl p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <!-- Branch -->
+            <select name="branch" class="w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">All Branches</option>
+                <!-- Populate with actual branches -->
+            </select>
+            <!-- Section -->
+            <select name="section" class="w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">All Sections</option>
+                <!-- Populate with actual sections -->
+            </select>
+            <!-- Academic Year -->
+            <select name="academic_year" class="w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">All Years</option>
+                <!-- Populate with actual years -->
+            </select>
+            <!-- Department -->
+            <select name="department" class="w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">All Departments</option>
+                <!-- Populate with actual departments -->
+            </select>
+            <!-- Time Series -->
+            <select name="time_series" class="w-full rounded-md border-gray-300 shadow-sm">
+                <option value="">All Time</option>
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="3months">Last 3 Months</option>
+                <option value="year">This Year</option>
+            </select>
+            <button type="submit" class="w-full bg-green-800 text-white rounded-md py-2">Filter</button>
+        </div>
+    </form>
+
+    <!-- Export Button -->
+    <div class="flex justify-end mb-6">
+        <a href="{{ request.url | replace(request.url_root, '') }}&export=csv" class="bg-blue-800 text-white font-bold py-2 px-6 rounded-lg shadow-md">Export as CSV</a>
+    </div>
+    
+    <!-- Pass Table -->
+    <div class="bg-green-100 shadow-lg rounded-2xl overflow-hidden p-6">
+        <table id="passes-table" class="min-w-full leading-normal">
+            <thead class="bg-green-800 text-white">
+                <tr>
+                    <th class="px-6 py-3 text-left">Applicant</th>
+                    <th class="px-6 py-3 text-left">Reason</th>
+                    <th class="px-6 py-3 text-left">Date</th>
+                    <th class="px-6 py-3 text-left">Status</th>
+                    <th class="px-6 py-3 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in passes %}
+                <tr class="border-b border-green-200 hover:bg-green-200">
+                    <td class="px-6 py-4">{{ p.name }} ({{ p.applicant_type }})</td>
+                    <td class="px-6 py-4">{{ p.reason }}</td>
+                    <td class="px-6 py-4">{{ p.date.strftime('%Y-%m-%d') }}</td>
+                    <td class="px-6 py-4"><span class="px-2 py-1 font-semibold leading-tight text-{{ 'green-700 bg-green-100' if p.status == 'approved' else ('red-700 bg-red-100' if p.status == 'rejected' else 'yellow-700 bg-yellow-100') }} rounded-full">{{ p.status }}</span></td>
+                    <td class="px-6 py-4">
+                        <!-- Manual approval/rejection can be handled here if needed -->
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

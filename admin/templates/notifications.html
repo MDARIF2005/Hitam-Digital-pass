@@ -1,0 +1,48 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-8 py-8">
+    <h1 class="text-4xl font-extrabold text-green-900 mb-8">Notifications</h1>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Send Notification Form -->
+        <div class="lg:col-span-1 bg-green-100 shadow-lg rounded-2xl p-8">
+            <h2 class="text-3xl font-bold text-green-900 mb-6">Send Notification</h2>
+            <form action="{{ url_for('admin.notifications') }}" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label for="target" class="block text-sm font-medium text-green-800 mb-1">Target</label>
+                        <select name="target" id="target" class="w-full rounded-md border-gray-300 shadow-sm">
+                            <option value="all">All Users</option>
+                            <option value="students">All Students</option>
+                            <option value="faculty">All Faculty</option>
+                            <!-- Add more specific targets if needed -->
+                        </select>
+                    </div>
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-green-800 mb-1">Message</label>
+                        <textarea name="message" id="message" rows="4" class="w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-green-800 text-white rounded-md py-2">Send</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Notification History -->
+        <div class="lg:col-span-2 bg-green-100 shadow-lg rounded-2xl p-8">
+            <h2 class="text-3xl font-bold text-green-900 mb-6">History</h2>
+            <div class="space-y-4">
+                {% for notification in notifications %}
+                <div class="bg-white p-4 rounded-lg shadow-md">
+                    <p class="font-semibold">To: {{ notification.target }}</p>
+                    <p>{{ notification.message }}</p>
+                    <p class="text-xs text-gray-500 mt-2">{{ notification.timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                </div>
+                {% else %}
+                <p>No notifications sent yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

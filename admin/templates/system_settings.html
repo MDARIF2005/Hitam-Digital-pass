@@ -1,0 +1,87 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-8 py-8">
+    <h1 class="text-4xl font-extrabold text-green-900 mb-8">System Settings</h1>
+
+    <form action="{{ url_for('admin.system_settings') }}" method="POST">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Left Column -->
+            <div>
+                <!-- General Settings -->
+                <div class="bg-green-100 shadow-lg rounded-2xl p-8 mb-8">
+                    <h2 class="text-3xl font-bold text-green-900 mb-6">General</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="institute_name" class="block text-sm font-medium text-green-800 mb-1">Institute Name</label>
+                            <input type="text" name="institute_name" id="institute_name" value="{{ settings.institute_name }}" class="w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="institute_logo" class="block text-sm font-medium text-green-800 mb-1">Institute Logo URL</label>
+                            <input type="text" name="institute_logo" id="institute_logo" value="{{ settings.institute_logo }}" class="w-full rounded-md border-gray-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="theme_mode" class="block text-sm font-medium text-green-800 mb-1">Theme Mode</label>
+                            <select name="theme_mode" id="theme_mode" class="w-full rounded-md border-gray-300 shadow-sm">
+                                <option value="light" {% if settings.theme_mode == 'light' %}selected{% endif %}>Light</option>
+                                <option value="dark" {% if settings.theme_mode == 'dark' %}selected{% endif %}>Dark</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Automation Settings -->
+                <div class="bg-green-100 shadow-lg rounded-2xl p-8">
+                    <h2 class="text-3xl font-bold text-green-900 mb-6">Automation</h2>
+                    <div class="space-y-4">
+                        <label class="inline-flex items-center"><input type="checkbox" name="notifications_enabled" {% if settings.notifications_enabled %}checked{% endif %} class="rounded h-5 w-5 border-gray-300 text-green-600 shadow-sm"> <span class="ml-2">Enable Notifications</span></label>
+                        <label class="inline-flex items-center"><input type="checkbox" name="email_alerts_enabled" {% if settings.email_alerts_enabled %}checked{% endif %} class="rounded h-5 w-5 border-gray-300 text-green-600 shadow-sm"> <span class="ml-2">Enable Email Alerts</span></label>
+                        <label class="inline-flex items-center"><input type="checkbox" name="auto_jumma_pass_enabled" {% if settings.auto_jumma_pass_enabled %}checked{% endif %} class="rounded h-5 w-5 border-gray-300 text-green-600 shadow-sm"> <span class="ml-2">Automatic Jumma Pass</span></label>
+                        <label class="inline-flex items-center"><input type="checkbox" name="auto_approve_absent_faculty" {% if settings.auto_approve_absent_faculty %}checked{% endif %} class="rounded h-5 w-5 border-gray-300 text-green-600 shadow-sm"> <span class="ml-2">Auto-approve for Absent Faculty</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+                <!-- Working Days & Timings -->
+                <div class="bg-green-100 shadow-lg rounded-2xl p-8">
+                    <h2 class="text-3xl font-bold text-green-900 mb-6">Working Days & Pass Timings</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-xl font-semibold text-green-800 mb-2">Student Working Days</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                {% for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] %}
+                                <label><input type="checkbox" name="student_working_days" value="{{ day }}" {% if day in settings.student_working_days %}checked{% endif %}> {{ day }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-green-800 mb-2">Faculty Working Days</h3>
+                            <div class="grid grid-cols-3 gap-2">
+                                {% for day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] %}
+                                <label><input type="checkbox" name="faculty_working_days" value="{{ day }}" {% if day in settings.faculty_working_days %}checked{% endif %}> {{ day }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-green-800 mb-2">Pass Timings</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label>Student Start</label><input type="time" name="student_pass_start_time" value="{{ settings.student_pass_start_time }}" class="w-full rounded-md border-gray-300 shadow-sm"></div>
+                                <div><label>Student End</label><input type="time" name="student_pass_end_time" value="{{ settings.student_pass_end_time }}" class="w-full rounded-md border-gray-300 shadow-sm"></div>
+                                <div><label>Faculty Start</label><input type="time" name="faculty_pass_start_time" value="{{ settings.faculty_pass_start_time }}" class="w-full rounded-md border-gray-300 shadow-sm"></div>
+                                <div><label>Faculty End</label><input type="time" name="faculty_pass_end_time" value="{{ settings.faculty_pass_end_time }}" class="w-full rounded-md border-gray-300 shadow-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Button -->
+        <div class="mt-8 flex justify-end">
+            <button type="submit" class="bg-green-800 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg">Save Settings</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

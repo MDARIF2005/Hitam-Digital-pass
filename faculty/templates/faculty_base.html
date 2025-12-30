@@ -1,0 +1,31 @@
+
+{% extends "layout.html" %}
+
+{% block navigation %}
+<nav class="bg-primary p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+        <a href="{{ url_for('faculty.dashboard') }}" class="text-white text-2xl font-bold">CampusPass</a>
+        <div class="hidden md:flex space-x-4">
+            <a href="{{ url_for('faculty.dashboard') }}" class="text-white">Dashboard</a>
+            <a href="{{ url_for('auth.logout') }}" class="text-white">Logout</a>
+        </div>
+        <div class="md:hidden">
+            <button @click="open = !open" class="text-white focus:outline-none">
+                <svg class="h-6 w-6" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+    </div>
+    <div x-show="open" class="md:hidden">
+        <a href="{{ url_for('faculty.dashboard') }}" class="block px-4 py-2 text-white">Dashboard</a>
+        <a href="{{ url_for('auth.logout') }}" class="block px-4 py-2 text-white">Logout</a>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="py-10">
+  <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+    {% block faculty_content %}{% endblock %}
+  </div>
+</div>
+{% endblock %}

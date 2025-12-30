@@ -1,0 +1,49 @@
+{% extends "admin_base.html" %}
+
+{% block title %}{{ action }} {{ role_type | capitalize }} Role{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-8">
+    <div class="py-8">
+        <h2 class="text-2xl font-semibold leading-tight">{{ action }} {{ role_type | capitalize }} Role</h2>
+
+        <form method="POST" action="{{ url_for('admin.edit_role', role_type=role_type, role_id=role_id) if action == 'Edit' else url_for('admin.add_role', role_type=role_type) }}">
+            <div class="mt-4">
+                <label for="name" class="block text-sm font-medium text-gray-700">Role Name</label>
+                <input type="text" name="name" id="name" value="{{ role.name | default('') }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+
+            {% if role_type == 'student' %}
+            <div class="mt-4">
+                <label for="branch" class="block text-sm font-medium text-gray-700">Branch</label>
+                <input type="text" name="branch" id="branch" value="{{ role.branch | default('') }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+            <div class="mt-4">
+                <label for="section" class="block text-sm font-medium text-gray-700">Section</label>
+                <input type="text" name="section" id="section" value="{{ role.section | default('') }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+            <div class="mt-4">
+                <label for="academic_year" class="block text-sm font-medium text-gray-700">Academic Year</label>
+                <input type="text" name="academic_year" id="academic_year" value="{{ role.academic_year | default('') }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+            {% endif %}
+
+            {% if role_type == 'faculty' %}
+            <div class="mt-4">
+                <label for="department" class="block text-sm font-medium text-gray-700">Department</label>
+                <input type="text" name="department" id="department" value="{{ role.department | default('') }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+            {% endif %}
+
+            <div class="mt-4">
+                <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                <input type="number" name="priority" id="priority" value="{{ role.priority | default(1) }}" class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+            </div>
+
+            <div class="mt-6">
+                <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded-md">{{ action }} Role</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

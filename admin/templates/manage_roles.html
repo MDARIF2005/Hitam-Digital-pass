@@ -1,0 +1,160 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Roles & Approval Settings{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-12">
+    <h2 class="text-3xl font-bold text-gray-800">Roles & Approval Settings</h2>
+
+    <!-- Student Approval Roles -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800">Student Approval Roles</h3>
+            <p class="text-gray-600 text-sm mt-1">Roles for approving student passes (e.g., Teacher, Mentor). Scope is based on Branch, Section, and Year.</p>
+        </div>
+        <div class="p-6">
+            <!-- Add Role Form -->
+            <form action="{{ url_for('admin.add_student_approval_role') }}" method="POST" class="mb-8 p-4 border rounded-lg">
+                <h4 class="text-lg font-semibold text-gray-700 mb-4">Add New Student Approval Role</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="student_role_name" class="block text-sm font-medium text-gray-700">Role Name</label>
+                        <input type="text" name="role_name" id="student_role_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="student_role_priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                        <input type="number" name="priority" id="student_role_priority" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="e.g., 1, 2, 3">
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Role</button>
+                </div>
+            </form>
+
+            <!-- Existing Roles Table -->
+            <h4 class="text-lg font-semibold text-gray-700 mb-4">Existing Roles</h4>
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Priority</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for role in student_approval_roles %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ role.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ role.priority }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ url_for('admin.edit_role', role_id=role.id) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
+                            <a href="{{ url_for('admin.delete_role', role_id=role.id) }}" class="text-red-600 hover:text-red-900">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Faculty Approval Roles -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800">Faculty Approval Roles</h3>
+            <p class="text-gray-600 text-sm mt-1">Roles for approving faculty passes (e.g., Coordinator, Program Head). Scope is based on Department.</p>
+        </div>
+        <div class="p-6">
+             <!-- Add Role Form -->
+            <form action="{{ url_for('admin.add_faculty_approval_role') }}" method="POST" class="mb-8 p-4 border rounded-lg">
+                <h4 class="text-lg font-semibold text-gray-700 mb-4">Add New Faculty Approval Role</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="faculty_role_name" class="block text-sm font-medium text-gray-700">Role Name</label>
+                        <input type="text" name="role_name" id="faculty_role_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="faculty_role_priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                        <input type="number" name="priority" id="faculty_role_priority" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="e.g., 1, 2, 3">
+                    </div>
+                </div>
+                 <div class="mt-4 flex justify-end">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Role</button>
+                </div>
+            </form>
+            <!-- Existing Roles Table -->
+            <h4 class="text-lg font-semibold text-gray-700 mb-4">Existing Roles</h4>
+            <table class="min-w-full divide-y divide-gray-200">
+                 <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Priority</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                 <tbody class="bg-white divide-y divide-gray-200">
+                    {% for role in faculty_approval_roles %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ role.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ role.priority }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ url_for('admin.edit_role', role_id=role.id) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
+                            <a href="{{ url_for('admin.delete_role', role_id=role.id) }}" class="text-red-600 hover:text-red-900">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Head Approval Roles -->
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+            <h3 class="text-xl font-semibold text-gray-800">Head Approval Roles</h3>
+            <p class="text-gray-600 text-sm mt-1">Roles for final department/college-level approvals (e.g., Principal, Dean).</p>
+        </div>
+        <div class="p-6">
+             <!-- Add Role Form -->
+            <form action="{{ url_for('admin.add_head_approval_role') }}" method="POST" class="mb-8 p-4 border rounded-lg">
+                <h4 class="text-lg font-semibold text-gray-700 mb-4">Add New Head Approval Role</h4>
+                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="head_role_name" class="block text-sm font-medium text-gray-700">Role Name</label>
+                        <input type="text" name="role_name" id="head_role_name" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                    </div>
+                    <div>
+                        <label for="head_role_priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                        <input type="number" name="priority" id="head_role_priority" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" placeholder="e.g., 1, 2, 3">
+                    </div>
+                </div>
+                 <div class="mt-4 flex justify-end">
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg">Add Role</button>
+                </div>
+            </form>
+            <!-- Existing Roles Table -->
+            <h4 class="text-lg font-semibold text-gray-700 mb-4">Existing Roles</h4>
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role Name</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Priority</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for role in head_approval_roles %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ role.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ role.priority }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <a href="{{ url_for('admin.edit_role', role_id=role.id) }}" class="text-indigo-600 hover:text-indigo-900 mr-4">Edit</a>
+                            <a href="{{ url_for('admin.delete_role', role_id=role.id) }}" class="text-red-600 hover:text-red-900">Delete</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

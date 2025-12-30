@@ -1,0 +1,127 @@
+
+{% extends "admin_base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-8">
+    <h2 class="text-3xl font-bold text-gray-800">User Management</h2>
+    <a href="{{ url_for('admin.add_user') }}" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-transform duration-200 hover:scale-105">
+      + Add User
+    </a>
+  </div>
+
+  <!-- Students Table -->
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h3 class="text-xl font-semibold text-gray-800">Students</h3>
+    </div>
+    <div class="p-6">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roll Number</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Branch</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for student in students %}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">{{ student.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ student.roll_number }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ student.branch }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <a href="{{ url_for('admin.edit_user', role='student', uid=student.uid) }}" class="text-green-600 hover:text-green-900">Edit</a>
+                <form action="{{ url_for('admin.delete_user', role='student', uid=student.uid) }}" method="POST" class="inline">
+                    <button type="submit" class="text-red-600 hover:text-red-900 ml-4">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="4" class="text-center py-4">No students found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Faculty Table -->
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden mb-8">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h3 class="text-xl font-semibold text-gray-800">Faculty</h3>
+    </div>
+    <div class="p-6">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class.="bg-white divide-y divide-gray-200">
+          {% for member in faculty %}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">{{ member.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ member.email }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ member.department }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <a href="{{ url_for('admin.edit_user', role='faculty', uid=member.uid) }}" class="text-green-600 hover:text-green-900">Edit</a>
+                <form action="{{ url_for('admin.delete_user', role='faculty', uid=member.uid) }}" method="POST" class="inline">
+                    <button type="submit" class="text-red-600 hover:text-red-900 ml-4">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="4" class="text-center py-4">No faculty found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Admins Table -->
+  <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+      <h3 class="text-xl font-semibold text-gray-800">Admins</h3>
+    </div>
+    <div class="p-6">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for admin in admins %}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">{{ admin.name }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">{{ admin.email }}</td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <a href="{{ url_for('admin.edit_user', role='admin', uid=admin.uid) }}" class="text-green-600 hover:text-green-900">Edit</a>
+                <form action="{{ url_for('admin.delete_user', role='admin', uid=admin.uid) }}" method="POST" class="inline">
+                    <button type="submit" class="text-red-600 hover:text-red-900 ml-4">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% else %}
+            <tr>
+              <td colspan="3" class="text-center py-4">No admins found.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

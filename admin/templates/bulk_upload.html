@@ -1,0 +1,41 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-8 py-8">
+    <div class="max-w-3xl mx-auto">
+        <h1 class="text-4xl font-extrabold text-green-900 mb-4">Bulk Upload for {{ item_type.capitalize() }}</h1>
+        <p class="text-lg text-gray-700 mb-6">Upload a CSV or XLSX file to add multiple {{ item_type }} at once.</p>
+
+        <div class="bg-green-100 shadow-lg rounded-2xl p-6">
+            <form action="{{ url_for('admin.bulk_upload', item_type=item_type) }}" method="post" enctype="multipart/form-data">
+                <div class="mb-6">
+                    <label for="file" class="block text-lg font-semibold text-gray-800 mb-2">Upload File</label>
+                    <input type="file" name="file" id="file" accept=".csv, .xlsx" class="w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-5 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" required>
+                </div>
+                <div class="flex justify-end gap-4">
+                    <a href="{{ url_for('admin.manage_' + item_type) }}" class="py-2 px-6 bg-gray-300 rounded-lg">Cancel</a>
+                    <button type="submit" class="py-2 px-6 bg-blue-800 text-white rounded-lg hover:bg-blue-700">Upload and Process</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="mt-8 bg-gray-50 p-6 rounded-lg shadow-inner">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">File Format Instructions</h2>
+            <p class="mb-4">The first row of your file must contain the headers. Ensure they match the required format exactly.</p>
+            
+            {% if item_type == 'faculty' %}
+            <h3 class="font-semibold text-lg mb-2">Required Headers for Faculty:</h3>
+            <code class="bg-gray-200 text-sm p-2 rounded-md block whitespace-pre-wrap mb-4">name,email,phone,department,gender,religion,status,password,assigned_roles</code>
+            <h4 class="font-semibold mb-2">`assigned_roles` Format:</h4>
+            <p class="mb-2">This column must contain a JSON string. For multiple roles, create a list of objects.</p>
+            <p class="font-mono bg-gray-200 text-sm p-2 rounded-md block whitespace-pre-wrap mb-2">Single Role: `[{"role_id": "role_id_123"}]`</p>
+            <p class="font-mono bg-gray-200 text-sm p-2 rounded-md block whitespace-pre-wrap mb-4">Teacher/Mentor Role with Mapping: `[{"role_id": "role_id_abc", "mapping": {"branch": "CSE", "section": "A", "academic_year": 2025}}]`</p>
+            
+            {% elif item_type == 'students' %}
+            <h3 class="font-semibold text-lg mb-2">Required Headers for Students:</h3>
+            <code class="bg-gray-200 text-sm p-2 rounded-md block whitespace-pre-wrap">name,email,password,roll_number,branch,section,academic_year,gender,religion,phone,parent1_name,parent1_email,parent1_phone,parent2_name,parent2_email,parent2_phone</code>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

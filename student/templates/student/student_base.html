@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Portal{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Custom Styles for a more professional look */
+        :root {
+            --primary-color: #1a531b; /* Deep green */
+            --secondary-color: #f1f5f9; /* Light gray background */
+            --accent-color: #4ade80; /* Bright green accent */
+            --text-dark: #1e293b;
+            --text-light: #f8fafc;
+        }
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+        }
+        .sidebar {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+        }
+        .sidebar-link {
+            transition: all 0.2s ease-in-out;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--accent-color);
+        }
+    </style>
+</head>
+<body class="flex h-screen bg-gray-100">
+
+    <!-- Sidebar -->
+    <aside class="w-64 sidebar flex flex-col p-4 space-y-4">
+        <div class="text-center py-4">
+            <h1 class="text-2xl font-bold text-white">Student Portal</h1>
+        </div>
+        <nav class="flex-grow">
+            <a href="{{ url_for('student.dashboard') }}" class="sidebar-link flex items-center p-3 rounded-lg {% if request.endpoint == 'student.dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt w-6"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('student.gate_pass') }}" class="sidebar-link flex items-center p-3 rounded-lg {% if request.endpoint == 'student.gate_pass' %}active{% endif %}">
+                <i class="fas fa-ticket-alt w-6"></i>
+                <span>Gate Pass</span>
+            </a>
+            <a href="{{ url_for('student.profile') }}" class="sidebar-link flex items-center p-3 rounded-lg {% if request.endpoint == 'student.profile' %}active{% endif %}">
+                <i class="fas fa-user-circle w-6"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+        <div class="pt-4 border-t border-green-700">
+             <a href="{{ url_for('auth.logout') }}" class="sidebar-link flex items-center p-3 rounded-lg">
+                <i class="fas fa-sign-out-alt w-6"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-8">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="mb-4">
+                {% for category, message in messages %}
+                  <div class="p-4 rounded-md {{ 'bg-green-100 text-green-800' if category == 'success' else 'bg-red-100 text-red-800' }}" role="alert">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+            
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+</body>
+</html>

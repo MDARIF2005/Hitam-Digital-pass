@@ -1,0 +1,15 @@
+body {
+    font-family: sans-serif;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f0f0f0;
+}
+
+main {
+    padding: 1rem;
+}

@@ -1,0 +1,31 @@
+
+{% extends "admin_base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+    <div class="px-6 py-4 bg-gray-50 border-b border-gray-200">
+        <h2 class="text-2xl font-bold text-gray-800">Edit Role</h2>
+        <p class="text-gray-600 text-sm mt-1">Update the details for the '{{ role.name }}' role.</p>
+    </div>
+    <div class="p-6">
+        <form action="{{ url_for('admin.edit_role', role_type=role_type, role_id=role_id) }}" method="POST">
+            <div class="grid grid-cols-1 gap-6">
+                <div>
+                    <label for="role_name" class="block text-sm font-medium text-gray-700">Role Name</label>
+                    <input type="text" name="role_name" id="role_name" value="{{ role.name }}" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+                <div>
+                    <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
+                    <input type="number" name="priority" id="priority" value="{{ role.priority }}" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md">
+                </div>
+            </div>
+            <div class="mt-6 flex items-center justify-end gap-x-4">
+                <a href="{{ url_for('admin.roles_settings') }}" class="text-sm font-semibold leading-6 text-gray-900">Cancel</a>
+                <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

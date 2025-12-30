@@ -1,0 +1,55 @@
+<div class="overflow-x-auto">
+    <table class="min-w-full leading-normal dark:text-gray-300">
+        <thead>
+            <tr>
+                <th class="table-header">Name</th>
+                <th class="table-header">Priority</th>
+                {% if 'student' in role_type %}
+                <th class="table-header">Branch</th>
+                <th class="table-header">Section</th>
+                <th class="table-header">Year</th>
+                {% elif 'faculty' in role_type %}
+                <th class="table-header">Department</th>
+                {% endif %}
+                <th class="table-header">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800">
+            {% for role in roles %}
+            <tr>
+                <td class="table-cell">{{ role.name }}</td>
+                <td class="table-cell">{{ role.priority }}</td>
+                {% if 'student' in role_type %}
+                <td class="table-cell">{{ role.branch | default('Any') }}</td>
+                <td class="table-cell">{{ role.section | default('Any') }}</td>
+                <td class="table-cell">{{ role.academic_year | default('Any') }}</td>
+                {% elif 'faculty' in role_type %}
+                <td class="table-cell">{{ role.department | default('Any') }}</td>
+                {% endif %}
+                <td class="table-cell">
+                    <!-- In-line editing can be complex; for now, we link to an edit page -->
+                    <!-- <a href="#" class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-600">Edit</a> -->
+                    <form action="{{ url_for('admin.delete_role', role_type=role_type, role_id=role.id) }}" method="POST" class="inline-block ml-4" onsubmit="return confirm('Are you sure you want to delete this role?');">
+                        <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-600 font-semibold">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center py-5 border-b border-gray-200 dark:border-gray-700">
+                    <p class="text-gray-500 dark:text-gray-400">No roles of this type have been defined.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    .table-header {
+        @apply px-5 py-3 border-b-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-900 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider;
+    }
+    .table-cell {
+        @apply px-5 py-4 border-b border-gray-200 dark:border-gray-700 text-sm;
+    }
+</style>

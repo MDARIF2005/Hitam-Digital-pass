@@ -1,0 +1,69 @@
+<div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+    <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
+        <table class="min-w-full leading-normal">
+            <thead>
+                <tr>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Role Name
+                    </th>
+                    {% if role_type == 'student' %}
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Branch
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Section
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Academic Year
+                    </th>
+                    {% endif %}
+                    {% if role_type == 'faculty' %}
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Department
+                    </th>
+                    {% endif %}
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Priority
+                    </th>
+                    <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Actions
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for role in roles %}
+                <tr>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {{ role.name }}
+                    </td>
+                    {% if role_type == 'student' %}
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {{ role.branch | default('N/A') }}
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {{ role.section | default('N/A') }}
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {{ role.academic_year | default('N/A') }}
+                    </td>
+                    {% endif %}
+                    {% if role_type == 'faculty' %}
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {{ role.department | default('N/A') }}
+                    </td>
+                    {% endif %}
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        {{ role.priority }}
+                    </td>
+                    <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                        <a href="{{ url_for('admin.edit_role', role_type=role_type, role_id=role.id) }}" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                        <form action="{{ url_for('admin.delete_role', role_type=role_type, role_id=role.id) }}" method="POST" class="inline-block ml-2">
+                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

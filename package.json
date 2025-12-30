@@ -1,0 +1,15 @@
+{
+  "name": "college-gate-pass",
+  "version": "1.0.0",
+  "description": "A web application for managing college gate passes.",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i static/src/input.css -o static/dist/output.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}

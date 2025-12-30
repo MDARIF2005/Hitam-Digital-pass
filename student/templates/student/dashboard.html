@@ -1,0 +1,52 @@
+{% extends "student/student_base.html" %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Welcome Header -->
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ student.name }}!</h1>
+        <p class="text-gray-600">Roll Number: {{ student.roll_number }}</p>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Gate Pass Timings -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-700 mb-3">Gate Pass Information</h2>
+            <div class="space-y-2 text-gray-600">
+                <p><strong>Current Time:</strong> <span id="current-time"></span></p>
+                <p><strong>Allowed Timings:</strong> {{ settings.student_pass_start_time or 'N/A' }} - {{ settings.student_pass_end_time or 'N/A' }}</p>
+                <p><strong>Working Days:</strong> {{ (settings.student_working_days or []) | join(', ') }}</p>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="bg-white shadow rounded-lg p-6 flex flex-col items-center justify-center">
+            {% if is_pass_application_open %}
+                <h2 class="text-xl font-semibold text-gray-700 mb-4">Ready to go out?</h2>
+                <a href="{{ url_for('student.gate_pass') }}" class="w-full text-center bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300">
+                    Apply for Gate Pass
+                </a>
+            {% else %}
+                <i class="fas fa-times-circle text-red-500 text-4xl mb-3"></i>
+                <h2 class="text-xl font-semibold text-gray-700">Applications Closed</h2>
+                <p class="text-gray-500 mt-2 text-center">{{ closed_reason }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const timeElement = document.getElementById('current-time');
+    function updateTime() {
+        const now = new Date();
+        timeElement.textContent = now.toLocaleTimeString();
+    }
+    setInterval(updateTime, 1000);
+    updateTime(); // Initial call
+});
+</script>
+{% endblock %}

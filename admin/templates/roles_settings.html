@@ -1,0 +1,225 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 sm:px-8 py-8" data-all-roles='''{{ all_roles | tojson | safe }}'''>
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-extrabold text-gray-800">Roles & Approval Settings</h1>
+        <button data-action="add-role" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg shadow-md transition duration-300">Add New Role</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mb-6 border-b border-gray-200">
+        <ul class="flex flex-wrap -mb-px text-sm font-medium text-center" id="rolesTabs">
+            <li class="mr-2">
+                <a href="#student_pass" class="tab-link inline-block p-4 border-b-2 rounded-t-lg">🧑‍🎓 Student Approval</a>
+            </li>
+            <li class="mr-2">
+                <a href="#faculty_pass" class="tab-link inline-block p-4 border-b-2 rounded-t-lg">🏫 Department-Level</a>
+            </li>
+            <li class="mr-2">
+                <a href="#head_approval" class="tab-link inline-block p-4 border-b-2 rounded-t-lg">🎓 Head-Level</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="rolesTabContent">
+        {% for category, title in [('student_pass', 'Student Approval Roles'), ('faculty_pass', 'Department-Level Faculty Approval'), ('head_approval', 'Head-Level Faculty Approval')] %}
+        <div id="{{ category }}" class="tab-pane hidden p-4 rounded-lg bg-gray-50">
+            <h2 class="text-2xl font-bold text-gray-700 mb-4">{{ title }}</h2>
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table class="min-w-full leading-normal">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role Name</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role ID</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Priority</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fallback Role(s)</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created Date</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role in roles[category] %}
+                        <tr class="border-b border-gray-200 hover:bg-gray-50">
+                            <td class="px-5 py-5 text-sm">{{ role.role_name }}</td>
+                            <td class="px-5 py-5 text-sm text-gray-500">{{ role.role_id }}</td>
+                            <td class="px-5 py-5 text-sm">{{ role.priority }}</td>
+                            <td class="px-5 py-5 text-sm">{{ role.fallback_roles | join(', ') if role.fallback_roles else 'None' }}</td>
+                            <td class="px-5 py-5 text-sm">{{ role.created_at.strftime('%Y-%m-%d') if role.created_at else 'N/A' }}</td>
+                            <td class="px-5 py-5 text-center">
+                                <button data-action="edit-role" data-item-id="{{ role.role_id }}" class="text-blue-600 hover:text-blue-800 font-bold">Edit</button>
+                                {% if role.role_name not in ['Teacher', 'Mentor'] %}
+                                <button data-action="delete-role" data-item-id="{{ role.role_id }}" data-item-name="{{ role.role_name }}" class="text-red-600 hover:text-red-800 font-bold ml-4">Delete</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Add/Edit Role Modal -->
+<div id="roleModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="fixed inset-0 bg-gray-800 bg-opacity-75"></div>
+        <div class="bg-white rounded-lg shadow-2xl transform sm:max-w-lg sm:w-full">
+            <form id="roleForm" method="POST">
+                <div class="px-6 py-4">
+                    <h3 id="roleModalTitle" class="text-2xl font-bold text-gray-800">Add New Role</h3>
+                    <div class="mt-6 grid grid-cols-1 gap-6">
+                        <input type="text" name="role_name" placeholder="Role Name" class="w-full rounded-md border-gray-300 shadow-sm" required>
+                        <select name="approval_type" class="w-full rounded-md border-gray-300 shadow-sm" required>
+                            <option value="" disabled selected>Select Approval Type</option>
+                            <option value="student_pass">Student Approval</option>
+                            <option value="faculty_pass">Department-Level</option>
+                            <option value="head_approval">Head-Level</option>
+                        </select>
+                        <input type="number" name="priority" placeholder="Priority" class="w-full rounded-md border-gray-300 shadow-sm" required>
+                        <div>
+                            <label for="fallback_roles" class="block text-sm font-medium text-gray-700">Fallback Roles</label>
+                            <select id="fallback_roles" name="fallback_roles" class="w-full rounded-md border-gray-300 shadow-sm" multiple>
+                                <!-- Options will be populated by JS -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-100 px-6 py-4 flex justify-end gap-4">
+                    <button type="button" data-action="close-modal" data-modal-id="roleModal" class="py-2 px-6 bg-gray-300 rounded-lg">Cancel</button>
+                    <button type="submit" class="py-2 px-6 bg-blue-600 text-white rounded-lg">Save Role</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteConfirmationModal" class="fixed z-50 inset-0 overflow-y-auto hidden">
+    <div class="flex items-center justify-center min-h-screen">
+        <div class="fixed inset-0 bg-gray-800 bg-opacity-75"></div>
+        <div class="bg-white rounded-lg shadow-2xl transform sm:max-w-md sm:w-full">
+            <form id="deleteForm" method="POST">
+                <div class="p-6 text-center">
+                    <h3 class="text-2xl font-bold text-red-800">Confirm Deletion</h3>
+                    <p class="mt-2">Are you sure you want to delete the role <strong id="deleteRoleName"></strong>? This action cannot be undone.</p>
+                </div>
+                <div class="bg-gray-100 px-6 py-4 flex justify-center gap-4">
+                    <button type="button" data-action="close-modal" data-modal-id="deleteConfirmationModal" class="py-2 px-6 bg-gray-300 rounded-lg">Cancel</button>
+                    <button type="submit" class="py-2 px-6 bg-red-700 text-white rounded-lg">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- Data ---
+    const container = document.querySelector('.container');
+    const allRoles = JSON.parse(container.dataset.allRoles || '[]');
+    const rolesMap = new Map(allRoles.map(r => [r.role_id, r]));
+
+    // --- Modals ---
+    const roleModal = document.getElementById('roleModal');
+    const deleteConfirmationModal = document.getElementById('deleteConfirmationModal');
+    const roleForm = document.getElementById('roleForm');
+    const deleteForm = document.getElementById('deleteForm');
+
+    // --- Helper Functions ---
+    const openModal = (modal) => modal.classList.remove('hidden');
+    const closeModal = (modal) => modal.classList.add('hidden');
+
+    function populateFallbackOptions(currentRoleId = null) {
+        const select = document.getElementById('fallback_roles');
+        select.innerHTML = allRoles
+            .filter(role => role.role_id !== currentRoleId) // A role cannot be its own fallback
+            .map(role => `<option value="${role.role_id}">${role.role_name}</option>`)
+            .join('');
+    }
+
+    // --- Event Handlers ---
+    function openAddModal() {
+        roleForm.action = "{{ url_for('admin.add_role') }}";
+        document.getElementById('roleModalTitle').innerText = 'Add New Role';
+        roleForm.reset();
+        populateFallbackOptions();
+        openModal(roleModal);
+    }
+
+    function openEditModal(roleId) {
+        const role = rolesMap.get(roleId);
+        if (!role) return;
+
+        roleForm.action = `/admin/edit/role/${roleId}`;
+        document.getElementById('roleModalTitle').innerText = 'Edit Role';
+        roleForm.reset();
+        
+        roleForm.role_name.value = role.role_name;
+        roleForm.approval_type.value = role.approval_type;
+        roleForm.priority.value = role.priority;
+
+        populateFallbackOptions(roleId);
+        const fallbackSelect = document.getElementById('fallback_roles');
+        (role.fallback_roles || []).forEach(fallbackId => {
+            const option = fallbackSelect.querySelector(`option[value="${fallbackId}"]`);
+            if (option) option.selected = true;
+        });
+
+        openModal(roleModal);
+    }
+
+    function openDeleteModal(roleId, roleName) {
+        deleteForm.action = `/admin/delete/roles/${roleId}`;
+        document.getElementById('deleteRoleName').textContent = roleName;
+        openModal(deleteConfirmationModal);
+    }
+
+    // --- Event Listeners ---
+    document.body.addEventListener('click', function(event) {
+        const target = event.target.closest('[data-action]');
+        if (!target) return;
+
+        event.preventDefault();
+        const action = target.dataset.action;
+        const modalId = target.dataset.modalId;
+
+        if (action === 'close-modal') closeModal(document.getElementById(modalId));
+        if (action === 'add-role') openAddModal();
+        if (action === 'edit-role') openEditModal(target.dataset.itemId);
+        if (action === 'delete-role') openDeleteModal(target.dataset.itemId, target.dataset.itemName);
+    });
+
+    // --- Tabs Functionality ---
+    const tabs = document.querySelectorAll('.tab-link');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    const activateTab = (tab) => {
+        tabs.forEach(t => t.classList.remove('border-blue-500', 'text-blue-600', 'border-gray-300'));
+        tabPanes.forEach(p => p.classList.add('hidden'));
+
+        tab.classList.add('border-blue-500', 'text-blue-600');
+        document.querySelector(tab.getAttribute('href')).classList.remove('hidden');
+    };
+
+    tabs.forEach(tab => tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.hash = tab.getAttribute('href').substring(1);
+        activateTab(tab);
+    }));
+
+    // Activate tab based on URL hash or default to first
+    const hash = window.location.hash;
+    const activeTab = hash ? document.querySelector(`.tab-link[href="${hash}"]`) : tabs[0];
+    if (activeTab) {
+        activateTab(activeTab);
+    } else if (tabs.length > 0) {
+        activateTab(tabs[0]);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,42 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="h3 mb-4 text-gray-800">{{ title }}</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Role Details</h6>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('admin.add_role') }}">
+            <div class="form-group">
+                <label for="role_name">Role Name</label>
+                <input type="text" class="form-control" id="role_name" name="role_name" required>
+            </div>
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <input type="number" class="form-control" id="priority" name="priority" required value="0">
+                <small class="form-text text-muted">A lower number means higher priority.</small>
+            </div>
+            <div class="form-group">
+                <label>Permissions</label>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="scope_admin" name="scope" value="admin">
+                    <label class="custom-control-label" for="scope_admin">Admin Access</label>
+                </div>
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="scope_faculty" name="scope" value="faculty">
+                    <label class="custom-control-label" for="scope_faculty">Faculty Access</label>
+                </div>
+                 <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="scope_student" name="scope" value="student">
+                    <label class="custom-control-label" for="scope_student">Student Access</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Role</button>
+            <a href="{{ url_for('admin.manage_roles') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-4xl font-extrabold text-green-900">Admin Dashboard</h1>
+        <div class="flex space-x-4">
+            <a href="{{ url_for('admin.manage_students') }}" class="py-2 px-4 bg-green-700 text-white rounded-lg hover:bg-green-800 shadow-md transition"><i class="fas fa-user-plus"></i> Add Student</a>
+            <a href="{{ url_for('admin.manage_faculty') }}" class="py-2 px-4 bg-green-700 text-white rounded-lg hover:bg-green-800 shadow-md transition"><i class="fas fa-chalkboard-teacher"></i> Add Faculty</a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-green-100 rounded-2xl shadow-lg p-6 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-green-800">Total Students</h2>
+                <p class="text-4xl font-bold text-green-800">{{ stats_cards.total_students }}</p>
+            </div>
+            <i class="fas fa-user-graduate text-4xl text-green-500"></i>
+        </div>
+        <div class="bg-green-100 rounded-2xl shadow-lg p-6 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-green-800">Total Faculty</h2>
+                <p class="text-4xl font-bold text-green-800">{{ stats_cards.total_faculty }}</p>
+            </div>
+            <i class="fas fa-chalkboard-teacher text-4xl text-green-500"></i>
+        </div>
+        <div class="bg-green-100 rounded-2xl shadow-lg p-6">
+            <h2 class="text-lg font-semibold text-green-800 mb-2">Total Passes</h2>
+            <p class="text-base font-semibold text-yellow-600">Pending: {{ stats_cards.total_passes.pending }}</p>
+            <p class="text-base font-semibold text-green-600">Approved: {{ stats_cards.total_passes.approved }}</p>
+            <p class="text-base font-semibold text-red-600">Rejected: {{ stats_cards.total_passes.rejected }}</p>
+        </div>
+        <div class="bg-green-100 rounded-2xl shadow-lg p-6 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-green-800">Total Admins</h2>
+                <p class="text-4xl font-bold text-green-800">{{ stats_cards.total_admins }}</p>
+            </div>
+            <i class="fas fa-user-shield text-4xl text-green-500"></i>
+        </div>
+    </div>
+
+    <!-- Charts and Activity Feed -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        <!-- Pass Trends Chart -->
+        <div class="lg:col-span-2 bg-green-100 rounded-2xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-green-900 mb-4">Pass Trends (Last 7 Days)</h2>
+            <canvas id="passTrendsChart" data-labels='{{ pass_trends.labels | tojson }}' data-data='{{ pass_trends.data | tojson }}'></canvas>
+        </div>
+        <!-- Activity Feed -->
+        <div class="bg-green-100 rounded-2xl shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-green-900 mb-4">Recent Activity</h2>
+            <div class="space-y-4">
+                {% for action in activity_feed %}
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-green-200 flex items-center justify-center mr-4">
+                        <i class="fas fa-clipboard-check text-green-700"></i>
+                    </div>
+                    <div>
+                        <p class="font-semibold">{{ action.name }} ({{ action.applicant_type }})</p>
+                        <p class="text-sm text-gray-600">{{ action.reason }} - <span class="font-bold">{{ action.status }}</span></p>
+                        <p class="text-xs text-gray-500">{{ action.status_timestamp.strftime('%Y-%m-%d %H:%M') }}</p>
+                    </div>
+                </div>
+                {% else %}
+                <p>No recent activity.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Department-wise Ratios Chart -->
+    <div class="bg-green-100 rounded-2xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold text-green-900 mb-4">Department-wise Approval Ratios</h2>
+        <canvas id="departmentChart" data-labels='{{ department_chart_data.labels | tojson }}' data-datasets='{{ department_chart_data.datasets | tojson }}'></canvas>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Pass Trends Chart
+    const passTrendsChartEl = document.getElementById('passTrendsChart');
+    const passTrendsLabels = JSON.parse(passTrendsChartEl.dataset.labels);
+    const passTrendsData = JSON.parse(passTrendsChartEl.dataset.data);
+    const passTrendsCtx = passTrendsChartEl.getContext('2d');
+
+    new Chart(passTrendsCtx, {
+        type: 'line',
+        data: {
+            labels: passTrendsLabels,
+            datasets: [{
+                label: 'Pass Requests',
+                data: passTrendsData,
+                backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                borderColor: 'rgba(76, 175, 80, 1)',
+                borderWidth: 2,
+                tension: 0.4
+            }]
+        }
+    });
+
+    // Department-wise Approval Ratios Chart
+    const departmentChartEl = document.getElementById('departmentChart');
+    const departmentChartLabels = JSON.parse(departmentChartEl.dataset.labels);
+    const departmentChartDatasets = JSON.parse(departmentChartEl.dataset.datasets);
+    const departmentCtx = departmentChartEl.getContext('2d');
+
+    new Chart(departmentCtx, {
+        type: 'bar',
+        data: {
+            labels: departmentChartLabels,
+            datasets: departmentChartDatasets
+        },
+        options: {
+            scales: {
+                x: { stacked: true },
+                y: { stacked: true }
+            }
+        }
+    });
+</script>
+{% endblock %}

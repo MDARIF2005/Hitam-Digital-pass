@@ -1,0 +1,130 @@
+{% extends "student/student_base.html" %}
+
+{% block title %}Gate Pass{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Gate Pass</h1>
+
+    {% if existing_pass %}
+        {% if existing_pass.status == 'approved' %}
+            <!-- Pass Visualization -->
+            <div class="card mb-3" style="max-width: 100%;">
+                <div class="card-header" style="text-align: center;">
+                    <h2>Hitam Gate Pass</h2>
+                </div>
+                <div class="row g-0">
+                    <div class="col-md-4" style="text-align: center;">
+                        <img src="{{ student.image_url or url_for('static', filename='default-avatar.png') }}" class="img-fluid rounded-start" alt="student_image" style="margin-left:10px; margin-top:10px; width: 200px; height: 250px;"><br>
+                        <span>Name: &nbsp;</span><span>{{ student.name }}</span><br>
+                        <span>Roll no.: &nbsp;</span><span>{{ student.roll_number }}</span>
+                    </div>
+                    <div class="col-md-8" >
+                        <div class="card-body" Style="text-align: left;">
+                            <h5 class="card-title" style="margin:0px 10px 10px 10px;"><span style="font-weight:bold;" > Gate pass type:&nbsp;&nbsp; </span><span id="type">{{ existing_pass.pass_type }}</span></h5>
+                            <h5 class="card-title"style="margin:0px 10px 10px 10px;"><span style="font-weight:bold;" >Year and section:&nbsp;&nbsp;</span><span id="status">{{ student.academic_year}} Year&nbsp;{{student.branch}}&nbsp;{{student.section}}</span></h5>
+                            <h5 class="card-text"style="margin:0px 10px 10px 10px;"><span style="font-weight:bold;" >Reason:&nbsp;&nbsp; </span><span id="reason">{{ existing_pass.reason }}</span></h5>
+                            <h5 class="card-text"style="margin:0px 10px 10px 10px;"><span style="font-weight:bold;" >Time:</span> &nbsp; <span style="font-weight:bold;" >From:</span> <span id="pass_from">{{ existing_pass.out_time }}</span> &nbsp; <span style="font-weight:bold;" >To:</span> <span id="pass_to">{{ existing_pass.in_time }}</span></h5>
+                        <br><br>
+                            <div  class="row g-0" style="text-align: center; margin-left: 20px; width:100%">
+
+                              {%if existing_pass.pass_type == "Emergency" %}
+                              <div class="col-md-4" style="text-align: center; width:30%;">
+                                <h5 class="card-title"><span id="status">{{ mentor_name }}</span></h5>
+                                <h4 class="card-title"> <span id="status">Mentor</span></h4>
+                              </div>
+                              {% endif %}
+
+                              <div class="col-md-4" style="text-align: center;width:70%;">
+                                <h6 class="card-title"><span id="status">{{ hod_name }}</span></h6>
+                                <h5 class="card-title"> <span id="status" style="font-weight:bold">HOD</span></h5>
+                              </div>
+                            </div>
+                            <p class="card-text"><small class="text-body-secondary"> {{existing_pass.out_time}}&nbsp;,{{ existing_pass.date.strftime('%Y-%m-%d') }}</small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% elif existing_pass.status == 'pending' %}
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
+              <p class="font-bold">Pending Approval</p>
+              <p>Your gate pass request has been submitted and is waiting for approval.</p>
+            </div>
+        {% elif existing_pass.status == 'rejected' %}
+            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
+              <p class="font-bold">Request Rejected</p>
+              <p>Your gate pass request has been rejected.</p>
+            </div>
+        {% endif %}
+    {% else %}
+    <!-- Gate Pass Application Form -->
+    <div class="bg-white shadow-md rounded-lg p-8">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Apply for a New Gate Pass</h2>
+        <form action="{{ url_for('student.gate_pass') }}" method="POST">
+            <!-- Student Info (Read-only) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Name</label>
+                    <input type="text" value="{{ student.name }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Roll Number</label>
+                    <input type="text" value="{{ student.roll_number }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Branch</label>
+                    <input type="text" value="{{ student.branch }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Year & Section</label>
+                    <input type="text" value="{{ student.academic_year }} - {{ student.section }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                </div>
+            </div>
+
+            <!-- Pass Details -->
+            <div class="space-y-6">
+                 <div>
+                    <label for="pass_type" class="block text-sm font-medium text-gray-700">Type of Pass</label>
+                    <select id="pass_type" name="pass_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                        <option value="normal">Normal</option>
+                        <option value="emergency">Emergency</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="reason" class="block text-sm font-medium text-gray-700">Reason</label>
+                    <textarea id="reason" name="reason" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Please provide a brief reason for your pass request." required></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <div>
+                        <label class="block text-sm font-medium text-gray-700">Date</label>
+                        <input type="text" id="date" value="" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">Time Out</label>
+                        <input type="text" id="time" value="" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="mt-8 text-right">
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">Submit Pass Request</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const dateElement = document.getElementById('date');
+    const timeElement = document.getElementById('time');
+
+    if(dateElement && timeElement){
+        const now = new Date();
+        dateElement.value = now.toLocaleDateString();
+        timeElement.value = now.toLocaleTimeString();
+    }
+});
+</script>
+{% endblock %}

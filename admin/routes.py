@@ -47,6 +47,18 @@ def main_admin_required(f):
             return redirect(request.referrer or url_for('admin.index'))
         return f(*args, **kwargs)
     return decorated_function
+    
+@admin_bp.route('/add/<item_type>', methods=['GET', 'POST'])
+def add_item(item_type):
+    if item_type == 'user':
+        # logic for adding user
+        pass
+    elif item_type == 'faculty':
+        # logic for adding faculty
+        pass
+    # ...
+    pass
+
 
 @admin_bp.route('/')
 def index():

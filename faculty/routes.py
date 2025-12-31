@@ -7,12 +7,12 @@ faculty_bp = Blueprint('faculty', __name__, url_prefix='/faculty', template_fold
 
 @faculty_bp.route('/dashboard', endpoint='dashboard')
 def dashboard():
-    if 'user_uid' not in session:
+    if 'user_id' not in session:
         flash('Please log in to access your dashboard.', 'danger')
         return redirect(url_for('auth.login'))
 
     db = firestore.client()
-    user_uid = session['user_uid']
+    user_uid = session['user_id']
 
     try:
         user_ref = db.collection('faculty').document(user_uid)
@@ -79,11 +79,11 @@ def dashboard():
 
 @faculty_bp.route('/process_pass/<pass_id>/<action>', methods=['POST'], endpoint='process_pass')
 def process_pass(pass_id, action):
-    if 'user_uid' not in session:
+    if 'user_id' not in session:
         return redirect(url_for('auth.login'))
 
     db = firestore.client()
-    user_uid = session['user_uid']
+    user_uid = session['user_id']
     pass_ref = db.collection('passes').document(pass_id)
 
     try:

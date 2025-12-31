@@ -56,6 +56,9 @@
                     <td class="px-6 py-4 text-center">
                         <button data-action="edit" data-item-type="student" data-item-id="{{ student.id }}" class="text-green-700 hover:text-green-900">Edit</button>
                         <button data-action="delete" data-item-type="students" data-item-id="{{ student.id }}" class="text-red-600 hover:text-red-800 ml-4">Delete</button>
+                        <form method="POST" action="{{ url_for('admin.reset_student_password', item_id=student.id) }}" style="display:inline" onsubmit="return confirm('Reset password to Hitam@123 for this student?');">
+                            <button type="submit" class="text-blue-600 hover:text-blue-800 ml-4">Reset Password</button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
@@ -78,7 +81,7 @@
                             <h4 class="text-lg font-semibold mb-2">Student Information</h4>
                             <input type="text" name="name" placeholder="Full Name" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
                             <input type="email" name="email" placeholder="Email" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
-                            <input type="password" name="password" placeholder="Password" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
+                            <!-- Password removed: default password will be assigned automatically -->
                             <input type="text" name="roll_number" placeholder="Roll Number" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
                             <input type="text" name="branch" placeholder="Branch" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
                             <input type="text" name="section" placeholder="Section" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
@@ -162,8 +165,10 @@ document.addEventListener('DOMContentLoaded', function() {
         studentForm.action = "{{ url_for('admin.add_user', role='student') }}";
         studentForm.reset();
         document.getElementById('imagePreview').src = "{{ url_for('static', filename='default-avatar.png') }}";
-        studentForm.elements.password.placeholder = "Password (required)";
-        studentForm.elements.password.required = true;
+        if (studentForm.elements.password) {
+            studentForm.elements.password.placeholder = "Password (required)";
+            studentForm.elements.password.required = true;
+        }
         openModal(studentModal);
     }
 
@@ -203,8 +208,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.getElementById('imagePreview').src = student.image_url || "{{ url_for('static', filename='default-avatar.png') }}";
         studentForm.elements.image_url.value = student.image_url || '';
-        studentForm.elements.password.placeholder = "New password (optional)";
-        studentForm.elements.password.required = false;
+        if (studentForm.elements.password) {
+            studentForm.elements.password.placeholder = "New password (optional)";
+            studentForm.elements.password.required = false;
+        }
 
         openModal(studentModal);
     }

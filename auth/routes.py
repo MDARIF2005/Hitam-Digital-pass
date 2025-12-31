@@ -81,6 +81,8 @@ def login():
 
     return render_template('login.html', title="Login")
 
+# Forgot-password routes removed: password resets are admin-only
+
 @auth_bp.route('/logout')
 def logout():
     """Logs the user out and clears the session."""

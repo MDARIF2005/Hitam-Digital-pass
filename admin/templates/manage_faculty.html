@@ -17,7 +17,13 @@
         <input type="text" name="search" placeholder="Search by Name, Email, or ID..." class="w-1/2 rounded-full py-2 px-4 bg-white text-green-900 border-2 border-green-200 focus:outline-none focus:border-green-800" value="{{ request.form.get('search', '') }}">
         <select name="department" class="rounded-lg py-2 px-4 bg-white text-green-900 border-2 border-green-200 focus:outline-none focus:border-green-800">
             <option value="">All Departments</option>
-            {% for dept in faculty|map(attribute='department')|unique|sort %}
+            {% set depts = [] %}
+            {% for f in faculty %}
+                {% if f.get('department') and f['department'] not in depts %}
+                    {% set _ = depts.append(f['department']) %}
+                {% endif %}
+            {% endfor %}
+            {% for dept in depts|sort %}
             <option value="{{ dept }}" {% if request.form.get('department') == dept %}selected{% endif %}>{{ dept }}</option>
             {% endfor %}
         </select>
@@ -31,7 +37,12 @@
     </form>
 
     <!-- Faculty Table -->
-    <div id="faculty-container" class="bg-green-100 shadow-lg rounded-2xl overflow-hidden" data-faculty='''{{ faculty | tojson | safe }}}''' data-roles='''{{ roles | tojson | safe }}}'''>
+    <div id="faculty-container" class="bg-green-100 shadow-lg rounded-2xl overflow-hidden" data-faculty='{{ faculty | tojson | safe }}' data-roles='{{ roles | tojson | safe }}'>
+        <!-- Expose server-side roles/faculty to JS in a safe global (fallback for dataset parsing issues) -->
+        <script>
+            window.SERVER_ROLES = {{ roles | tojson | safe }};
+            window.SERVER_FACULTY = {{ faculty | tojson | safe }};
+        </script>
         <table class="min-w-full leading-normal">
             <thead class="bg-green-800 text-white">
                 <tr>
@@ -65,6 +76,9 @@
                     <td class="px-5 py-5 text-center">
                         <button data-action="edit" data-item-type="faculty" data-item-id="{{ member.id }}" class="text-green-700 hover:text-green-900 font-bold">Edit</button>
                         <button data-action="delete" data-item-type="faculty" data-item-id="{{ member.id }}" class="text-red-600 hover:text-red-800 ml-4 font-bold">Delete</button>
+                        <form method="POST" action="{{ url_for('admin.reset_faculty_password', item_id=member.id) }}" style="display:inline" onsubmit="return confirm('Reset password to Faculty ID for this user?');">
+                            <button type="submit" class="text-blue-600 hover:text-blue-800 ml-4 font-bold">Reset Password</button>
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
@@ -87,9 +101,10 @@
                             <h4 class="text-lg font-semibold mb-3 text-gray-800">Basic Information</h4>
                             <input type="text" name="name" placeholder="Full Name" class="w-full rounded-md border-gray-300 shadow-sm mb-3" required>
                             <input type="email" name="email" placeholder="Email" class="w-full rounded-md border-gray-300 shadow-sm mb-3" required>
-                            <input type="password" name="password" placeholder="Password" class="w-full rounded-md border-gray-300 shadow-sm mb-3">
+                            <!-- Password removed: default password will be assigned automatically -->
                             <input type="text" name="phone" placeholder="Phone" class="w-full rounded-md border-gray-300 shadow-sm mb-3">
                             <input type="text" name="department" placeholder="Department" class="w-full rounded-md border-gray-300 shadow-sm mb-3">
+                            <input type="text" name="faculty_id" placeholder="Faculty ID (optional)" class="w-full rounded-md border-gray-300 shadow-sm mb-3">
                             <div class="grid grid-cols-2 gap-4 mb-3">
                                 <input type="text" name="gender" placeholder="Gender" class="w-full rounded-md border-gray-300 shadow-sm">
                                 <input type="text" name="religion" placeholder="Religion" class="w-full rounded-md border-gray-300 shadow-sm">
@@ -150,10 +165,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     // --- Data from Flask ---
     const facultyContainer = document.getElementById('faculty-container');
-    const facultyData = JSON.parse(facultyContainer.dataset.faculty || '[]');
-    const allRoles = JSON.parse(facultyContainer.dataset.roles || '[]');
+    // Prefer explicit global provided by server to avoid dataset parsing edge-cases
+    const facultyData = window.SERVER_FACULTY || JSON.parse(facultyContainer.dataset.faculty || '[]');
+    const allRoles = window.SERVER_ROLES || JSON.parse(facultyContainer.dataset.roles || '[]');
     const facultyMap = new Map(facultyData.map(f => [f.id, f]));
     const rolesMap = new Map(allRoles.map(r => [r.role_id, r]));
+
+    console.log('DEBUG - allRoles from Firebase (resolved):', allRoles);
+    console.log('DEBUG - rolesMap keys:', Array.from(rolesMap.keys()));
 
     // --- Modals & Forms ---
     const facultyModal = document.getElementById('facultyModal');
@@ -178,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Create options, adding a placeholder
         let options = '<option value="" disabled ' + (selectedRoleId ? '' : 'selected') + '>Select a role</option>';
-        options += allRoles.map(r => `<option value="${r.role_id}" ${r.role_id === selectedRoleId ? 'selected' : ''}>${r.role_name}</option>`).join('');
+        options += allRoles.map(r => `<option value="${r.role_id}" ${r.role_id === selectedRoleId ? 'selected' : ''}>${r.role_name} (${r.approval_type})</option>`).join('');
 
         const updateMappingFields = (roleId, container) => {
             const roleDef = rolesMap.get(roleId);
@@ -225,8 +244,10 @@ document.addEventListener('DOMContentLoaded', function() {
         facultyForm.reset();
         assignedRolesContainer.innerHTML = '';
         document.getElementById('imagePreview').src = "{{ url_for('static', filename='default-avatar.png') }}";
-        facultyForm.elements.password.placeholder = "Password (required)";
-        facultyForm.elements.password.required = true;
+        if (facultyForm.elements.password) {
+            facultyForm.elements.password.placeholder = "Password (required)";
+            facultyForm.elements.password.required = true;
+        }
         openModal(facultyModal);
     }
 
@@ -250,8 +271,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
         (member.assigned_roles || []).forEach(role => createRoleElement(role));
 
-        facultyForm.elements.password.placeholder = "New password (optional)";
-        facultyForm.elements.password.required = false;
+        if (facultyForm.elements.password) {
+            facultyForm.elements.password.placeholder = "New password (optional)";
+            facultyForm.elements.password.required = false;
+        }
         openModal(facultyModal);
     }
 

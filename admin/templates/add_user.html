@@ -14,10 +14,7 @@
                 <label for="email" class="block text-gray-700 font-bold mb-2">Email</label>
                 <input type="email" id="email" name="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
             </div>
-            <div class="mb-4">
-                <label for="password" class="block text-gray-700 font-bold mb-2">Password</label>
-                <input type="password" id="password" name="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
-            </div>
+            <!-- Password input removed — system assigns a default password automatically -->
 
             {% if role == 'student' %}
             <div class="mb-4">
@@ -29,8 +26,15 @@
                 <input type="text" id="section" name="section" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             <div class="mb-4">
-                <label for="year" class="block text-gray-700 font-bold mb-2">Year</label>
-                <input type="text" id="year" name="year" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <label for="academic_year" class="block text-gray-700 font-bold mb-2">Academic Year</label>
+                <input type="text" id="academic_year" name="academic_year" placeholder="2025-2029" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            </div>
+            {% endif %}
+
+            {% if role == 'faculty' %}
+            <div class="mb-4">
+                <label for="faculty_id" class="block text-gray-700 font-bold mb-2">Faculty ID (optional)</label>
+                <input type="text" id="faculty_id" name="faculty_id" placeholder="f_2025_001" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             {% endif %}
 

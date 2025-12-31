@@ -57,10 +57,18 @@
             </div>
         {% endif %}
     {% else %}
+    <!-- Check if pass application is open -->
+    {% if not is_pass_application_open %}
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+          <p class="font-bold">Gate Pass Requests Not Available</p>
+          <p>{{ closed_reason }}</p>
+        </div>
+    {% endif %}
+
     <!-- Gate Pass Application Form -->
-    <div class="bg-white shadow-md rounded-lg p-8">
+    <div class="bg-white shadow-md rounded-lg p-8" {% if not is_pass_application_open %}style="opacity: 0.6; pointer-events: none;"{% endif %}>
         <h2 class="text-2xl font-semibold text-gray-800 mb-6">Apply for a New Gate Pass</h2>
-        <form action="{{ url_for('student.gate_pass') }}" method="POST">
+        <form action="{{ url_for('student.gate_pass') }}" method="POST" {% if not is_pass_application_open %}onsubmit="return false;"{% endif %}>
             <!-- Student Info (Read-only) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
@@ -85,14 +93,14 @@
             <div class="space-y-6">
                  <div>
                     <label for="pass_type" class="block text-sm font-medium text-gray-700">Type of Pass</label>
-                    <select id="pass_type" name="pass_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
+                    <select id="pass_type" name="pass_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required {% if not is_pass_application_open %}disabled{% endif %}>
                         <option value="normal">Normal</option>
                         <option value="emergency">Emergency</option>
                     </select>
                 </div>
                 <div>
                     <label for="reason" class="block text-sm font-medium text-gray-700">Reason</label>
-                    <textarea id="reason" name="reason" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Please provide a brief reason for your pass request." required></textarea>
+                    <textarea id="reason" name="reason" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Please provide a brief reason for your pass request." required {% if not is_pass_application_open %}disabled{% endif %}></textarea>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div>
@@ -108,7 +116,7 @@
 
             <!-- Submit Button -->
             <div class="mt-8 text-right">
-                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300">Submit Pass Request</button>
+                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300" {% if not is_pass_application_open %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>Submit Pass Request</button>
             </div>
         </form>
     </div>

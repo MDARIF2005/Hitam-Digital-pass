@@ -10,7 +10,7 @@ student_bp = Blueprint('student', __name__, url_prefix='/student', template_fold
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user_uid' not in session:
+        if 'user_id' not in session:
             flash('Please log in to access this page.', 'warning')
             return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
@@ -22,7 +22,7 @@ def login_required(f):
 @student_bp.route('/dashboard')
 @login_required
 def dashboard():
-    user_uid = session['user_uid']
+    user_uid = session['user_id']
     db = firestore.client()
     student_data = {}
     system_settings = {}
@@ -79,10 +79,12 @@ def dashboard():
 @student_bp.route('/gate-pass', methods=['GET', 'POST'])
 @login_required
 def gate_pass():
-    user_uid = session['user_uid']
+    user_uid = session['user_id']
     db = firestore.client()
     student_data = {}
     existing_pass = None
+    is_open = False
+    closed_reason = "System settings could not be loaded."
 
     try:
         student_ref = db.collection('students').document(user_uid)
@@ -105,7 +107,38 @@ def gate_pass():
     except Exception as e:
         flash(f"Error checking for existing passes: {e}", "danger")
 
+    # Check if pass application is open (within working hours/days)
+    try:
+        settings_ref = db.collection('settings').document('system').get()
+        if settings_ref.exists:
+            system_settings = settings_ref.to_dict()
+            
+            start_time_str = system_settings.get('student_pass_start_time', '00:00')
+            end_time_str = system_settings.get('student_pass_end_time', '23:59')
+            working_days = system_settings.get('student_working_days', [])
+            today_str = datetime.now().strftime('%a')
+            now = datetime.now().time()
+            
+            start_time = datetime.strptime(start_time_str, '%H:%M').time()
+            end_time = datetime.strptime(end_time_str, '%H:%M').time()
+
+            if today_str not in working_days:
+                is_open = False
+                closed_reason = "Gate pass requests are only available on working days."
+            elif not (start_time <= now <= end_time):
+                is_open = False
+                closed_reason = f"Gate pass requests are only accepted between {start_time_str} and {end_time_str}."
+            else:
+                is_open = True
+                closed_reason = ""
+    except Exception as e:
+        flash(f"Error fetching system settings: {e}", "danger")
+
     if request.method == 'POST':
+        if not is_open:
+            flash(f"Gate pass requests are not available right now. {closed_reason}", "warning")
+            return redirect(url_for('student.gate_pass'))
+
         if existing_pass:
             flash("You have already applied for a pass today.", "warning")
             return redirect(url_for('student.dashboard'))
@@ -136,16 +169,19 @@ def gate_pass():
         except Exception as e:
             flash(f"An error occurred while submitting your pass: {e}", "danger")
 
-    return render_template('student/gate_pass.html', student=student_data, existing_pass=existing_pass)
+    return render_template('student/gate_pass.html', 
+                         student=student_data, 
+                         existing_pass=existing_pass,
+                         is_pass_application_open=is_open,
+                         closed_reason=closed_reason)
 
 
 @student_bp.route('/profile')
 @login_required
 def profile():
-    user_uid = session['user_uid']
+    user_uid = session['user_id']
     db = firestore.client()
     student_data = {}
-    passes = []
 
     try:
         student_ref = db.collection('students').document(user_uid)
@@ -159,10 +195,4 @@ def profile():
         flash(f"Error fetching your profile: {e}", "danger")
         return redirect(url_for('auth.logout'))
 
-    try:
-        passes_query = db.collection('passes').where('applicant_id', '==', user_uid).order_by('date', direction=firestore.Query.DESCENDING).stream()
-        passes = [{**p.to_dict(), 'id': p.id} for p in passes_query]
-    except Exception as e:
-        flash(f"Error fetching your gate passes: {e}", "danger")
-
-    return render_template('student/profile.html', student=student_data, passes=passes)
+    return render_template('student/profile.html', student=student_data)

@@ -28,16 +28,6 @@
                             </select>
                         </div>
                     </div>
-                    <div class="bg-green-100 shadow-lg rounded-2xl p-8 mb-8">
-                        <h2 class="text-3xl font-bold text-green-900 mb-6">Pass Management</h2>
-                        <div class="space-y-4">
-                            <div>
-                                <a href="{{ url_for('admin.settings') }}#jumma_pass_settings" class="block py-2 px-4 rounded-md text-green-700 hover:bg-green-50">
-                                    Configure Jumma Pass Settings
-                                </a>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Automation Settings -->
@@ -81,6 +71,13 @@
                                 <div><label>Student End</label><input type="time" name="student_pass_end_time" value="{{ settings.student_pass_end_time }}" class="w-full rounded-md border-gray-300 shadow-sm"></div>
                                 <div><label>Faculty Start</label><input type="time" name="faculty_pass_start_time" value="{{ settings.faculty_pass_start_time }}" class="w-full rounded-md border-gray-300 shadow-sm"></div>
                                 <div><label>Faculty End</label><input type="time" name="faculty_pass_end_time" value="{{ settings.faculty_pass_end_time }}" class="w-full rounded-md border-gray-300 shadow-sm"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-green-800 mb-2">Jumma Prayer Pass Timings</h3>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label>From Time</label><input type="time" name="jumma_pass_start_time" value="{{ settings.jumma_pass_start_time }}" class="w-full rounded-md border-gray-300 shadow-sm"></div>
+                                <div><label>To Time</label><input type="time" name="jumma_pass_end_time" value="{{ settings.jumma_pass_end_time }}" class="w-full rounded-md border-gray-300 shadow-sm"></div>
                             </div>
                         </div>
                     </div>

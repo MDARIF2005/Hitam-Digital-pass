@@ -26,8 +26,8 @@
                 <input type="text" id="section" name="section" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             <div class="mb-4">
-                <label for="academic_year" class="block text-gray-700 font-bold mb-2">Academic Year</label>
-                <input type="text" id="academic_year" name="academic_year" placeholder="2025-2029" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                <label for="academic_year" class="block text-gray-700 font-bold mb-2">Academic Year (Start Year)</label>
+                <input type="text" id="academic_year" name="academic_year" placeholder="2025" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
             </div>
             {% endif %}
 
@@ -39,10 +39,24 @@
             {% endif %}
 
             <div class="flex items-center justify-between">
-                <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Add {{ role.capitalize() }}</button>
+                    <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300">Add {{ role.capitalize() }}</button>
                 <a href="{{ url_for('admin.manage_students') }}" class="text-gray-600">Cancel</a>
             </div>
         </form>
     </div>
 </div>
+    <script>
+    // Normalize academic year input to start year if admin enters a range like "2022-2026"
+    document.addEventListener('DOMContentLoaded', function(){
+        const form = document.querySelector('form[action^="{{ url_for(\'admin.add_user\', role=role) }}"]');
+        if(!form) return;
+        form.addEventListener('submit', function(e){
+            const input = form.querySelector('[name="academic_year"]');
+            if(input && input.value){
+                // take the portion before any hyphen
+                input.value = input.value.split('-')[0].trim();
+            }
+        });
+    });
+    </script>
 {% endblock %}

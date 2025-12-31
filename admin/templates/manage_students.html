@@ -39,7 +39,8 @@
                     <th class="px-6 py-3 text-left">Name</th>
                     <th class="px-6 py-3 text-left">Roll Number</th>
                     <th class="px-6 py-3 text-left">Branch</th>
-                    <th class="px-6 py-3 text-left">Academic Year</th>
+                    <th class="px-6 py-3 text-left">Current Year</th>
+                    <th class="px-6 py-3 text-left">Pass Out Year</th>
                     <th class="px-6 py-3 text-left">Attendance</th>
                     <th class="px-6 py-3 text-center">Actions</th>
                 </tr>
@@ -51,7 +52,8 @@
                     <td class="px-6 py-4">{{ student.name }}</td>
                     <td class="px-6 py-4">{{ student.roll_number }}</td>
                     <td class="px-6 py-4">{{ student.branch }}</td>
-                     <td class="px-6 py-4">{{ student.academic_year~ '-'~ (student.academic_year | int + 4) if student.academic_year }}</td>
+                    <td class="px-6 py-4">{{ student.academic_year }}</td>
+                    <td class="px-6 py-4 font-bold text-green-700">{{ student.pass_out_year or 'N/A' }}</td>
                     <td class="px-6 py-4">{{ student.attendance_percentage or 'N/A' }}%</td>
                     <td class="px-6 py-4 text-center">
                         <button data-action="edit" data-item-type="student" data-item-id="{{ student.id }}" class="text-green-700 hover:text-green-900">Edit</button>
@@ -85,7 +87,8 @@
                             <input type="text" name="roll_number" placeholder="Roll Number" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
                             <input type="text" name="branch" placeholder="Branch" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
                             <input type="text" name="section" placeholder="Section" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
-                            <input type="text" name="academic_year" placeholder="Academic Year (e.g., 2023-2027)" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
+                            <input type="text" name="academic_year" placeholder="Academic Year (e.g., 2023)" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
+                            <input type="text" name="pass_out_year" placeholder="Pass Out Year (e.g., 2027)" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
                             <input type="text" name="gender" placeholder="Gender" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
                             <input type="text" name="religion" placeholder="Religion" class="w-full rounded-md border-gray-300 shadow-sm mb-4">
                             <input type="text" name="phone" placeholder="Phone" class="w-full rounded-md border-gray-300 shadow-sm mb-4">

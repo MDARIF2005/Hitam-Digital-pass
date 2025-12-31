@@ -4,9 +4,13 @@ from flask import Flask, redirect, url_for
 import firebase_admin
 from firebase_admin import credentials, firestore
 from dotenv import load_dotenv
+from apscheduler.schedulers.background import BackgroundScheduler
 
 # Load environment variables from .env file
 load_dotenv()
+
+# Global scheduler instance
+scheduler = BackgroundScheduler()
 
 def create_app():
     """Create and configure an instance of the Flask application."""
@@ -43,6 +47,27 @@ def create_app():
     # --- Register Jinja Filters ---
     from admin.utils import format_datetime
     app.jinja_env.filters['format_datetime'] = format_datetime
+
+    # --- Initialize Scheduler for Automatic Jumma Pass Generation ---
+    try:
+        if not scheduler.running:
+            from student.jumma_scheduler import schedule_jumma_pass_generation
+            
+            # Get the configured Jumma time from system settings
+            db = firestore.client()
+            settings_ref = db.collection('settings').document('system').get()
+            
+            if settings_ref.exists:
+                settings = settings_ref.to_dict()
+                jumma_time = settings.get('jumma_pass_start_time', '12:00')
+            else:
+                jumma_time = '12:00'  # Default to noon
+            
+            schedule_jumma_pass_generation(scheduler, jumma_time)
+            scheduler.start()
+            print(f"Background scheduler started. Jumma passes will be generated at {jumma_time} every Friday.")
+    except Exception as e:
+        print(f"Warning: Failed to initialize background scheduler: {e}")
 
     # --- Root URL Logic ---
     @app.route('/')

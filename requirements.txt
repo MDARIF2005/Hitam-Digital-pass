@@ -7,5 +7,6 @@ autopep8
 # App
 Flask
 firebase-admin
+APScheduler
 
 python-dotenv

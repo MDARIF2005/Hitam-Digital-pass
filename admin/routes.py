@@ -395,6 +395,16 @@ def _build_student_data_from_row(row):
             data['academic_year'] = None
     else:
         data['academic_year'] = None
+    
+    # Add pass_out_year from bulk upload
+    pass_out_year_str = row.get('pass_out_year')
+    if pass_out_year_str:
+        try:
+            data['pass_out_year'] = int(pass_out_year_str)
+        except (ValueError, TypeError):
+            data['pass_out_year'] = None
+    else:
+        data['pass_out_year'] = None
         
     parents = []
     if row.get('parent1_name'):
@@ -463,6 +473,16 @@ def _build_student_data(form, item_id=None):
             data['academic_year'] = None
     else:
         data['academic_year'] = None
+    
+    # Add pass_out_year field
+    pass_out_year_str = form.get('pass_out_year')
+    if pass_out_year_str:
+        try:
+            data['pass_out_year'] = int(pass_out_year_str)
+        except ValueError:
+            data['pass_out_year'] = None
+    else:
+        data['pass_out_year'] = None
 
     parents = []
     if form.get('parent1_name'):

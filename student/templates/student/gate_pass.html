@@ -3,124 +3,244 @@
 {% block title %}Gate Pass{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Gate Pass</h1>
+<div class="max-w-6xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">Gate Pass Management</h1>
 
-    {% if existing_pass %}
-        {% if existing_pass.status == 'approved' %}
-            <!-- Pass Visualization -->
-            <div class="card mb-3" style="max-width: 100%;">
-                <div class="card-header" style="text-align: center;">
-                    <h2>Hitam Gate Pass</h2>
-                </div>
-                <div class="row g-0">
-                    <div class="col-md-4" style="text-align: center;">
-                        <img src="{{ student.image_url or url_for('static', filename='default-avatar.png') }}" class="img-fluid rounded-start" alt="student_image" style="margin-left:10px; margin-top:10px; width: 200px; height: 250px;"><br>
-                        <span>Name: &nbsp;</span><span>{{ student.name }}</span><br>
-                        <span>Roll no.: &nbsp;</span><span>{{ student.roll_number }}</span>
-                    </div>
-                    <div class="col-md-8" >
-                        <div class="card-body" Style="text-align: left;">
-                            <h5 class="card-title" style="margin:0px 10px 10px 10px;"><span style="font-weight:bold;" > Gate pass type:&nbsp;&nbsp; </span><span id="type">{{ existing_pass.pass_type }}</span></h5>
-                            <h5 class="card-title"style="margin:0px 10px 10px 10px;"><span style="font-weight:bold;" >Year and section:&nbsp;&nbsp;</span><span id="status">{{ student.academic_year}} Year&nbsp;{{student.branch}}&nbsp;{{student.section}}</span></h5>
-                            <h5 class="card-text"style="margin:0px 10px 10px 10px;"><span style="font-weight:bold;" >Reason:&nbsp;&nbsp; </span><span id="reason">{{ existing_pass.reason }}</span></h5>
-                            <h5 class="card-text"style="margin:0px 10px 10px 10px;"><span style="font-weight:bold;" >Time:</span> &nbsp; <span style="font-weight:bold;" >From:</span> <span id="pass_from">{{ existing_pass.out_time }}</span> &nbsp; <span style="font-weight:bold;" >To:</span> <span id="pass_to">{{ existing_pass.in_time }}</span></h5>
-                        <br><br>
-                            <div  class="row g-0" style="text-align: center; margin-left: 20px; width:100%">
-
-                              {%if existing_pass.pass_type == "Emergency" %}
-                              <div class="col-md-4" style="text-align: center; width:30%;">
-                                <h5 class="card-title"><span id="status">{{ mentor_name }}</span></h5>
-                                <h4 class="card-title"> <span id="status">Mentor</span></h4>
-                              </div>
-                              {% endif %}
-
-                              <div class="col-md-4" style="text-align: center;width:70%;">
-                                <h6 class="card-title"><span id="status">{{ hod_name }}</span></h6>
-                                <h5 class="card-title"> <span id="status" style="font-weight:bold">HOD</span></h5>
-                              </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left Column: Today's Pass Status & Form -->
+        <div class="lg:col-span-2">
+            {% if existing_pass %}
+                <!-- Today's Pass Status -->
+                <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Today's Pass Status</h2>
+                    
+                    {% if existing_pass.status == 'approved' %}
+                        <div class="border-4 border-green-500 rounded-lg p-6 mb-6 bg-green-50">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-check-circle text-green-500 text-3xl mr-3"></i>
+                                <h3 class="text-2xl font-bold text-green-700">APPROVED</h3>
                             </div>
-                            <p class="card-text"><small class="text-body-secondary"> {{existing_pass.out_time}}&nbsp;,{{ existing_pass.date.strftime('%Y-%m-%d') }}</small></p>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Pass Type</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ existing_pass.pass_type | title }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Date</p>
+                                    <p class="text-lg text-gray-800 font-bold">{% if existing_pass.date %}{{ existing_pass.date.strftime('%d-%m-%Y') }}{% else %}Today{% endif %}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Time Out</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ existing_pass.out_time }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Expected Return</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ existing_pass.in_time or 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Pass Out Year</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ student.pass_out_year or 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Current Year</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ student.academic_year }}</p>
+                                </div>
+                                <div class="col-span-2">
+                                    <p class="text-sm text-gray-600 font-semibold">Reason</p>
+                                    <p class="text-gray-800">{{ existing_pass.reason }}</p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+
+                    {% elif existing_pass.status == 'pending' %}
+                        <div class="border-4 border-yellow-500 rounded-lg p-6 mb-6 bg-yellow-50">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-clock text-yellow-500 text-3xl mr-3"></i>
+                                <h3 class="text-2xl font-bold text-yellow-700">PENDING APPROVAL</h3>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Pass Type</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ existing_pass.pass_type | title }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Submitted On</p>
+                                    <p class="text-lg text-gray-800 font-bold">{% if existing_pass.date %}{{ existing_pass.date.strftime('%d-%m-%Y %H:%M') }}{% else %}Today{% endif %}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Pass Out Year</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ student.pass_out_year or 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Current Year</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ student.academic_year }}</p>
+                                </div>
+                                <div class="col-span-2">
+                                    <p class="text-sm text-gray-600 font-semibold">Reason</p>
+                                    <p class="text-gray-800">{{ existing_pass.reason }}</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-yellow-600 mt-4">⏳ Your pass is under review. Please wait for approval.</p>
+                        </div>
+
+                    {% elif existing_pass.status == 'rejected' %}
+                        <div class="border-4 border-red-500 rounded-lg p-6 mb-6 bg-red-50">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-times-circle text-red-500 text-3xl mr-3"></i>
+                                <h3 class="text-2xl font-bold text-red-700">REJECTED</h3>
+                            </div>
+                            <p class="text-gray-800">Your pass request has been rejected.</p>
+                        </div>
+                    {% elif existing_pass.status == 'auto_approved' %}
+                        <div class="border-4 border-blue-500 rounded-lg p-6 mb-6 bg-blue-50">
+                            <div class="flex items-center mb-4">
+                                <i class="fas fa-check-circle text-blue-500 text-3xl mr-3"></i>
+                                <h3 class="text-2xl font-bold text-blue-700">AUTO-APPROVED (Jumma Pass)</h3>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Pass Type</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ existing_pass.pass_type | title }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Date</p>
+                                    <p class="text-lg text-gray-800 font-bold">{% if existing_pass.date %}{{ existing_pass.date.strftime('%d-%m-%Y') }}{% else %}Today{% endif %}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Prayer Time</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ existing_pass.out_time }} - {{ existing_pass.in_time }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Pass Out Year</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ student.pass_out_year or 'N/A' }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Current Year</p>
+                                    <p class="text-lg text-gray-800 font-bold">{{ student.academic_year }}</p>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-600 font-semibold">Status</p>
+                                    <p class="text-lg text-blue-700 font-bold">Automatic</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
-            </div>
-        {% elif existing_pass.status == 'pending' %}
-            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4" role="alert">
-              <p class="font-bold">Pending Approval</p>
-              <p>Your gate pass request has been submitted and is waiting for approval.</p>
-            </div>
-        {% elif existing_pass.status == 'rejected' %}
-            <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4" role="alert">
-              <p class="font-bold">Request Rejected</p>
-              <p>Your gate pass request has been rejected.</p>
-            </div>
-        {% endif %}
-    {% else %}
-    <!-- Check if pass application is open -->
-    {% if not is_pass_application_open %}
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
-          <p class="font-bold">Gate Pass Requests Not Available</p>
-          <p>{{ closed_reason }}</p>
+            {% else %}
+                <!-- Check if pass application is open -->
+                {% if not is_pass_application_open %}
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6" role="alert">
+                      <p class="font-bold">Gate Pass Requests Not Available</p>
+                      <p>{{ closed_reason }}</p>
+                    </div>
+                {% endif %}
+
+                <!-- Gate Pass Application Form -->
+                <div class="bg-white shadow-md rounded-lg p-8" {% if not is_pass_application_open %}style="opacity: 0.6; pointer-events: none;"{% endif %}>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Apply for a New Gate Pass</h2>
+                    <form action="{{ url_for('student.gate_pass') }}" method="POST" {% if not is_pass_application_open %}onsubmit="return false;"{% endif %}>
+                        <!-- Student Info (Read-only) -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" value="{{ student.name }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Roll Number</label>
+                                <input type="text" value="{{ student.roll_number }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Branch</label>
+                                <input type="text" value="{{ student.branch }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Year & Section</label>
+                                <input type="text" value="{{ student.academic_year }} - {{ student.section }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                            </div>
+                        </div>
+
+                        <!-- Pass Details -->
+                        <div class="space-y-6">
+                             <div>
+                                <label for="pass_type" class="block text-sm font-medium text-gray-700">Type of Pass</label>
+                                <select id="pass_type" name="pass_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required {% if not is_pass_application_open %}disabled{% endif %}>
+                                    <option value="normal">Normal</option>
+                                    <option value="emergency">Emergency</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="reason" class="block text-sm font-medium text-gray-700">Reason</label>
+                                <textarea id="reason" name="reason" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Please provide a brief reason for your pass request." required {% if not is_pass_application_open %}disabled{% endif %}></textarea>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                 <div>
+                                    <label class="block text-sm font-medium text-gray-700">Date</label>
+                                    <input type="text" id="date" value="" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Time Out</label>
+                                    <input type="text" id="time" value="" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="mt-8 text-right">
+                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300" {% if not is_pass_application_open %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>Submit Pass Request</button>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
         </div>
-    {% endif %}
 
-    <!-- Gate Pass Application Form -->
-    <div class="bg-white shadow-md rounded-lg p-8" {% if not is_pass_application_open %}style="opacity: 0.6; pointer-events: none;"{% endif %}>
-        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Apply for a New Gate Pass</h2>
-        <form action="{{ url_for('student.gate_pass') }}" method="POST" {% if not is_pass_application_open %}onsubmit="return false;"{% endif %}>
-            <!-- Student Info (Read-only) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Name</label>
-                    <input type="text" value="{{ student.name }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Roll Number</label>
-                    <input type="text" value="{{ student.roll_number }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Branch</label>
-                    <input type="text" value="{{ student.branch }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Year & Section</label>
-                    <input type="text" value="{{ student.academic_year }} - {{ student.section }}" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
-                </div>
-            </div>
-
-            <!-- Pass Details -->
-            <div class="space-y-6">
-                 <div>
-                    <label for="pass_type" class="block text-sm font-medium text-gray-700">Type of Pass</label>
-                    <select id="pass_type" name="pass_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required {% if not is_pass_application_open %}disabled{% endif %}>
-                        <option value="normal">Normal</option>
-                        <option value="emergency">Emergency</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="reason" class="block text-sm font-medium text-gray-700">Reason</label>
-                    <textarea id="reason" name="reason" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Please provide a brief reason for your pass request." required {% if not is_pass_application_open %}disabled{% endif %}></textarea>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Date</label>
-                        <input type="text" id="date" value="" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+        <!-- Right Column: Approved Passes History -->
+        <div class="lg:col-span-1">
+            <div class="bg-white shadow-lg rounded-lg p-6 sticky top-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-check-double text-green-600 mr-2"></i>
+                    Approved Passes
+                </h3>
+                
+                {% if approved_passes %}
+                    <div class="space-y-3 max-h-96 overflow-y-auto">
+                        {% for pass in approved_passes %}
+                            <div class="border-l-4 border-green-500 bg-green-50 p-4 rounded">
+                                <div class="flex justify-between items-start mb-2">
+                                    <span class="text-xs font-bold text-green-700 bg-green-200 px-2 py-1 rounded">
+                                        {% if pass.pass_type == 'jumma' %}
+                                            JUMMA
+                                        {% elif pass.is_automatic %}
+                                            AUTO
+                                        {% else %}
+                                            {{ pass.pass_type | upper }}
+                                        {% endif %}
+                                    </span>
+                                    {% if pass.status == 'auto_approved' %}
+                                        <i class="fas fa-robot text-blue-500 text-xs" title="Automatically Generated"></i>
+                                    {% endif %}
+                                </div>
+                                <p class="text-xs text-gray-600 font-semibold">
+                                    {% if pass.date %}{{ pass.date.strftime('%d %b %Y') }}{% endif %}
+                                </p>
+                                <p class="text-sm text-gray-800 font-bold mt-1">
+                                    {{ pass.out_time }} 
+                                    {% if pass.in_time %} - {{ pass.in_time }}{% endif %}
+                                </p>
+                                <p class="text-xs text-gray-600 mt-2 truncate">
+                                    {{ pass.reason }}
+                                </p>
+                            </div>
+                        {% endfor %}
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Time Out</label>
-                        <input type="text" id="time" value="" class="mt-1 block w-full bg-gray-100 rounded-md border-gray-300 shadow-sm" readonly>
+                {% else %}
+                    <div class="text-center py-8">
+                        <i class="fas fa-inbox text-gray-300 text-3xl mb-2"></i>
+                        <p class="text-gray-500">No approved passes yet</p>
                     </div>
-                </div>
+                {% endif %}
             </div>
-
-            <!-- Submit Button -->
-            <div class="mt-8 text-right">
-                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300" {% if not is_pass_application_open %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>Submit Pass Request</button>
-            </div>
-        </form>
+        </div>
     </div>
-    {% endif %}
 </div>
 
 <script>

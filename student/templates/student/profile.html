@@ -15,8 +15,18 @@
                 <p class="text-gray-600"><strong>Roll Number:</strong> {{ student.roll_number }}</p>
                 <p class="text-gray-600"><strong>Email:</strong> {{ student.email }}</p>
                 <p class="text-gray-600"><strong>Branch:</strong> {{ student.branch }}</p>
-                <p class="text-gray-600"><strong>Current Year:</strong> {{ student.academic_year }}</p>
-                <p class="text-gray-600"><strong>Pass Out Year:</strong> {{ student.pass_out_year or 'N/A' }}</p>
+                <p class="text-gray-600"><strong>Admission Year:</strong> {{ student.academic_year or 'N/A' }}</p>
+                <p class="text-gray-600"><strong>Batch:</strong>
+                    {% if student.academic_year and student.pass_out_year %}
+                        {{ student.academic_year }}-{{ student.pass_out_year }}
+                    {% elif student.academic_year and not student.pass_out_year %}
+                        {{ student.academic_year }}-{{ (student.academic_year + 4) if student.academic_year is number else 'N/A' }}
+                    {% elif student.pass_out_year and not student.academic_year %}
+                        {{ student.pass_out_year }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </p>
                 <p class="text-gray-600"><strong>Section:</strong> {{ student.section }}</p>
                 {% if student.phone %}<p class="text-gray-600"><strong>Phone:</strong> {{ student.phone }}</p>{% endif %}
                 {% if student.gender %}<p class="text-gray-600"><strong>Gender:</strong> {{ student.gender }}</p>{% endif %}

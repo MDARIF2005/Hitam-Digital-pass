@@ -23,9 +23,13 @@
             <option value="">All Sections</option>
             <!-- Add sections dynamically -->
         </select>
-        <select name="academic_year" class="rounded-lg py-2 px-4 bg-white text-green-900 border-2 border-green-200 focus:outline-none focus:border-green-800">
+        <select name="pass_out_year" class="rounded-lg py-2 px-4 bg-white text-green-900 border-2 border-green-200 focus:outline-none focus:border-green-800">
             <option value="">All Years</option>
-            <!-- Add years dynamically -->
+            {% if pass_out_years %}
+                {% for y in pass_out_years %}
+                    <option value="{{ y }}" {% if request.form.get('pass_out_year') and request.form.get('pass_out_year')|int == y %}selected{% endif %}>{{ y }}</option>
+                {% endfor %}
+            {% endif %}
         </select>
         <button type="submit" class="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-md">Filter</button>
     </form>
@@ -39,8 +43,8 @@
                     <th class="px-6 py-3 text-left">Name</th>
                     <th class="px-6 py-3 text-left">Roll Number</th>
                     <th class="px-6 py-3 text-left">Branch</th>
-                    <th class="px-6 py-3 text-left">Current Year</th>
-                    <th class="px-6 py-3 text-left">Pass Out Year</th>
+                    <th class="px-6 py-3 text-left">Admission Year</th>
+                    <th class="px-6 py-3 text-left">Batch</th>
                     <th class="px-6 py-3 text-left">Attendance</th>
                     <th class="px-6 py-3 text-center">Actions</th>
                 </tr>
@@ -52,8 +56,18 @@
                     <td class="px-6 py-4">{{ student.name }}</td>
                     <td class="px-6 py-4">{{ student.roll_number }}</td>
                     <td class="px-6 py-4">{{ student.branch }}</td>
-                    <td class="px-6 py-4">{{ student.academic_year }}</td>
-                    <td class="px-6 py-4 font-bold text-green-700">{{ student.pass_out_year or 'N/A' }}</td>
+                    <td class="px-6 py-4">{{ student.academic_year or 'N/A' }}</td>
+                    <td class="px-6 py-4 font-bold text-green-700">
+                        {% if student.academic_year and student.pass_out_year %}
+                            {{ student.academic_year }}-{{ student.pass_out_year }}
+                        {% elif student.academic_year and not student.pass_out_year %}
+                            {{ student.academic_year }}-{{ (student.academic_year + 4) if student.academic_year is number else 'N/A' }}
+                        {% elif student.pass_out_year and not student.academic_year %}
+                            {{ student.pass_out_year }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                     <td class="px-6 py-4">{{ student.attendance_percentage or 'N/A' }}%</td>
                     <td class="px-6 py-4 text-center">
                         <button data-action="edit" data-item-type="student" data-item-id="{{ student.id }}" class="text-green-700 hover:text-green-900">Edit</button>

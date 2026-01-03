@@ -38,12 +38,18 @@
                                     <p class="text-lg text-gray-800 font-bold">{{ existing_pass.in_time or 'N/A' }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-600 font-semibold">Pass Out Year</p>
-                                    <p class="text-lg text-gray-800 font-bold">{{ student.pass_out_year or 'N/A' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 font-semibold">Current Year</p>
-                                    <p class="text-lg text-gray-800 font-bold">{{ student.academic_year }}</p>
+                                    <p class="text-sm text-gray-600 font-semibold">Batch</p>
+                                    <p class="text-lg text-gray-800 font-bold">
+                                        {% if student.academic_year and student.pass_out_year %}
+                                            {{ student.academic_year }}-{{ student.pass_out_year }}
+                                        {% elif student.academic_year and not student.pass_out_year %}
+                                            {{ student.academic_year }}-{{ (student.academic_year + 4) if student.academic_year is number else 'N/A' }}
+                                        {% elif student.pass_out_year and not student.academic_year %}
+                                            {{ student.pass_out_year }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </p>
                                 </div>
                                 <div class="col-span-2">
                                     <p class="text-sm text-gray-600 font-semibold">Reason</p>
@@ -68,12 +74,18 @@
                                     <p class="text-lg text-gray-800 font-bold">{% if existing_pass.date %}{{ existing_pass.date.strftime('%d-%m-%Y %H:%M') }}{% else %}Today{% endif %}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-600 font-semibold">Pass Out Year</p>
-                                    <p class="text-lg text-gray-800 font-bold">{{ student.pass_out_year or 'N/A' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 font-semibold">Current Year</p>
-                                    <p class="text-lg text-gray-800 font-bold">{{ student.academic_year }}</p>
+                                    <p class="text-sm text-gray-600 font-semibold">Batch</p>
+                                    <p class="text-lg text-gray-800 font-bold">
+                                        {% if student.academic_year and student.pass_out_year %}
+                                            {{ student.academic_year }}-{{ student.pass_out_year }}
+                                        {% elif student.academic_year and not student.pass_out_year %}
+                                            {{ student.academic_year }}-{{ (student.academic_year + 4) if student.academic_year is number else 'N/A' }}
+                                        {% elif student.pass_out_year and not student.academic_year %}
+                                            {{ student.pass_out_year }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </p>
                                 </div>
                                 <div class="col-span-2">
                                     <p class="text-sm text-gray-600 font-semibold">Reason</p>
@@ -111,12 +123,18 @@
                                     <p class="text-lg text-gray-800 font-bold">{{ existing_pass.out_time }} - {{ existing_pass.in_time }}</p>
                                 </div>
                                 <div>
-                                    <p class="text-sm text-gray-600 font-semibold">Pass Out Year</p>
-                                    <p class="text-lg text-gray-800 font-bold">{{ student.pass_out_year or 'N/A' }}</p>
-                                </div>
-                                <div>
-                                    <p class="text-sm text-gray-600 font-semibold">Current Year</p>
-                                    <p class="text-lg text-gray-800 font-bold">{{ student.academic_year }}</p>
+                                    <p class="text-sm text-gray-600 font-semibold">Batch</p>
+                                    <p class="text-lg text-gray-800 font-bold">
+                                        {% if student.academic_year and student.pass_out_year %}
+                                            {{ student.academic_year }}-{{ student.pass_out_year }}
+                                        {% elif student.academic_year and not student.pass_out_year %}
+                                            {{ student.academic_year }}-{{ (student.academic_year + 4) if student.academic_year is number else 'N/A' }}
+                                        {% elif student.pass_out_year and not student.academic_year %}
+                                            {{ student.pass_out_year }}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </p>
                                 </div>
                                 <div>
                                     <p class="text-sm text-gray-600 font-semibold">Status</p>

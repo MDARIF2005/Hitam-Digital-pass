@@ -92,13 +92,47 @@ def index():
 @admin_bp.route('/manage-students', methods=['GET', 'POST'])
 def manage_students():
     db = get_db()
-    students_query = db.collection('students')
     try:
-        students_docs = students_query.stream()
+        students_docs = db.collection('students').stream()
         students = [{**doc.to_dict(), 'id': doc.id} for doc in students_docs]
     except Exception as e:
         flash(f"Error fetching students: {e}", "danger")
         students = []
+
+    # Build a list of available pass-out years for the filter dropdown
+    pass_out_years = sorted({s.get('pass_out_year') for s in students if s.get('pass_out_year')}, reverse=True)
+
+    # Apply filters if provided via POST
+    if request.method == 'POST':
+        search = (request.form.get('search') or '').strip().lower()
+        branch = (request.form.get('branch') or '').strip().lower()
+        section = (request.form.get('section') or '').strip().lower()
+        selected_pass_out = (request.form.get('pass_out_year') or '').strip()
+
+        try:
+            selected_pass_out_int = int(selected_pass_out) if selected_pass_out else None
+        except ValueError:
+            selected_pass_out_int = None
+
+        filtered = []
+        for s in students:
+            # Filter by pass out year
+            if selected_pass_out_int and s.get('pass_out_year') != selected_pass_out_int:
+                continue
+            # Filter by branch
+            if branch and (s.get('branch') or '').strip().lower() != branch:
+                continue
+            # Filter by section
+            if section and (s.get('section') or '').strip().lower() != section:
+                continue
+            # Search across name, roll_number and branch
+            if search:
+                hay = ' '.join([str(s.get('name') or ''), str(s.get('roll_number') or ''), str(s.get('branch') or '')]).lower()
+                if search not in hay:
+                    continue
+            filtered.append(s)
+
+        students = filtered
     
     try:
         roles_docs = db.collection('roles').stream()
@@ -106,8 +140,8 @@ def manage_students():
     except Exception as e:
         flash(f"Error fetching roles: {e}", "danger")
         roles = []
-        
-    return render_template('manage_students.html', students=students, roles=roles)
+
+    return render_template('manage_students.html', students=students, roles=roles, pass_out_years=pass_out_years)
 
 
 @admin_bp.route('/manage-faculty', methods=['GET', 'POST'])
